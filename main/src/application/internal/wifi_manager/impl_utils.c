@@ -14,18 +14,6 @@ static bool has_wifi_functions(dom_contracts_device_wifi_t* wifi);
 static bool has_wifi_repository_functions(dom_contracts_repository_wifi_t* wifi_repository);
 static bool has_preloaded_repository_functions(dom_contracts_repository_preloaded_t* preloaded_repository);
 
-dom_models_error_t app_internal_wifi_manager_impl_normalize_cfg(app_internal_wifi_manager_impl_cfg_t* cfg) {
-    if (!cfg) {
-        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
-    }
-
-    if (cfg->reconnect_max_trials == 0) {
-        cfg->reconnect_max_trials = APP_INTERNAL_WIFI_MANAGER_IMPL_DEFAULT_RECONNECT_MAX_TRIALS;
-    }
-
-    return DOMAIN_MODELS_ERROR_OK;
-}
-
 dom_models_error_t app_internal_wifi_manager_impl_validate_cfg(const app_internal_wifi_manager_impl_cfg_t* cfg) {
     if (!cfg ||
         !cfg->logger ||

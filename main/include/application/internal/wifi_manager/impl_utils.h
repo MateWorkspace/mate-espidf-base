@@ -10,8 +10,6 @@
 extern "C" {
 #endif
 
-dom_models_error_t app_internal_wifi_manager_impl_normalize_cfg(app_internal_wifi_manager_impl_cfg_t* cfg);
-
 dom_models_error_t app_internal_wifi_manager_impl_validate_cfg(const app_internal_wifi_manager_impl_cfg_t* cfg);
 
 dom_models_error_t app_internal_wifi_manager_impl_validate_credential(const dom_models_wifi_sta_connect_config_t* credential);

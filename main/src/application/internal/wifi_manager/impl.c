@@ -81,8 +81,7 @@ dom_usecases_internal_wifi_manager_t* app_internal_wifi_manager_impl_new(const a
     }
 
     memcpy(&ctx->cfg, cfg, sizeof(app_internal_wifi_manager_impl_cfg_t));
-    app_internal_wifi_manager_impl_normalize_cfg(&ctx->cfg);
-    ctx->reconnect_trial_count = 0;
+    ctx->connect_attempted = false;
 
     dom_usecases_internal_wifi_manager_t* self = dom_usecases_internal_wifi_manager_new(ctx);
     if (!self) {
@@ -166,7 +165,7 @@ static dom_models_error_t stop_impl(
         return err;
     }
 
-    ctx->reconnect_trial_count = 0;
+    ctx->connect_attempted = false;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi stopped successfully");
 
@@ -199,10 +198,6 @@ static dom_models_error_t get_status_impl(
         return err;
     }
 
-    if (out->wifi.sta_connection_status == DOM_MODELS_WIFI_STA_STATUS_CONNECTED) {
-        ctx->reconnect_trial_count = 0;
-    }
-
     err = app_internal_wifi_manager_impl_load_stored_sta(ctx, &out->stored);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load stored STA credential view: %s (%d)", dom_models_error_str(err), (int)err);
@@ -215,8 +210,7 @@ static dom_models_error_t get_status_impl(
         return err;
     }
 
-    out->reconnect_trial_count = ctx->reconnect_trial_count;
-    out->reconnect_max_trials  = ctx->cfg.reconnect_max_trials;
+    out->connect_attempted = ctx->connect_attempted;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi manager status retrieved successfully");
 
@@ -241,6 +235,8 @@ static dom_models_error_t connect_impl(
         return err;
     }
 
+    ctx->connect_attempted = true;
+
     err = ctx->cfg.wifi->connect_sta(ctx->cfg.wifi, credential);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to connect STA: %s (%d)", dom_models_error_str(err), (int)err);
@@ -252,8 +248,6 @@ static dom_models_error_t connect_impl(
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to store STA credential: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
-
-    ctx->reconnect_trial_count = 0;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "STA connection request accepted and credential stored successfully");
 
@@ -284,13 +278,13 @@ static dom_models_error_t connect_stored_impl(
         return err;
     }
 
+    ctx->connect_attempted = true;
+
     err = ctx->cfg.wifi->connect_sta(ctx->cfg.wifi, &credential);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to connect using stored STA credential: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
-
-    ctx->reconnect_trial_count = 0;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Stored STA connection request accepted successfully");
 
@@ -313,6 +307,8 @@ static dom_models_error_t disconnect_impl(
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to disconnect STA: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
+
+    ctx->connect_attempted = false;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "STA disconnected successfully");
 
@@ -364,8 +360,6 @@ static dom_models_error_t forget_stored_credential_impl(
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to forget stored STA credential: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
-
-    ctx->reconnect_trial_count = 0;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Stored STA credential forgotten successfully");
 
@@ -451,8 +445,8 @@ static dom_models_error_t need_reconnect_impl(
         return err;
     }
 
-    if (!try_connect_on_init) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because try-connect-on-init is disabled");
+    if (!ctx->connect_attempted && !try_connect_on_init) {
+        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because no connection trial has happened yet and try-connect-on-init is disabled");
         return DOMAIN_MODELS_ERROR_OK;
     }
 
@@ -464,13 +458,7 @@ static dom_models_error_t need_reconnect_impl(
     }
 
     if (status.sta_connection_status == DOM_MODELS_WIFI_STA_STATUS_CONNECTED) {
-        ctx->reconnect_trial_count = 0;
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because STA is connected");
-        return DOMAIN_MODELS_ERROR_OK;
-    }
-
-    if (ctx->reconnect_trial_count >= ctx->cfg.reconnect_max_trials) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because trial threshold is reached");
         return DOMAIN_MODELS_ERROR_OK;
     }
 
@@ -536,8 +524,8 @@ static dom_models_error_t try_reconnect_impl(
         return err;
     }
 
-    ctx->reconnect_trial_count++;
-    *attempted = true;
+    ctx->connect_attempted = true;
+    *attempted             = true;
 
     err = ctx->cfg.wifi->connect_sta(ctx->cfg.wifi, &credential);
     if (err != DOMAIN_MODELS_ERROR_OK) {
