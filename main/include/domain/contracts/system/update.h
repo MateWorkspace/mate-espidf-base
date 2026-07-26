@@ -24,6 +24,15 @@ struct dom_contracts_system_update_t {
     dom_models_error_t (*rollback)(
         dom_contracts_system_update_t* self
     );
+    dom_models_error_t (*add_event_callback)(
+        dom_contracts_system_update_t*     self,
+        void*                              cb_ctx,
+        dom_models_update_event_callback_t cb_func
+    );
+    dom_models_error_t (*remove_event_callback)(
+        dom_contracts_system_update_t*     self,
+        dom_models_update_event_callback_t cb_func
+    );
 };
 
 static inline dom_contracts_system_update_t* dom_contracts_system_update_new(void* ctx) {

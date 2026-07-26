@@ -2,13 +2,17 @@
 #define INFRASTRUCTURE_SYSTEM_UPDATE_ESP_HTTPS_IMPL_TYPES_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
+#include "domain/models/update.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define INF_SYSTEM_UPDATE_ESP_HTTPS_IMPL_EVENT_CALLBACK_MAX 4
 
 typedef struct {
     int         http_timeout_ms;
@@ -38,6 +42,10 @@ typedef struct {
     const esp_partition_t*                 update_partition;
     esp_ota_handle_t                       update_handle;
     bool                                   ota_started;
+    bool                                   update_task_running;
+    dom_models_update_event_callback_t     event_cb_funcs[INF_SYSTEM_UPDATE_ESP_HTTPS_IMPL_EVENT_CALLBACK_MAX];
+    void*                                  event_cb_ctxs[INF_SYSTEM_UPDATE_ESP_HTTPS_IMPL_EVENT_CALLBACK_MAX];
+    size_t                                 event_cb_cnt;
 } inf_system_update_esp_https_impl_ctx_t;
 
 #ifdef __cplusplus

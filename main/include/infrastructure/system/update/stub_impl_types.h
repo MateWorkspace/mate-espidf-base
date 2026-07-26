@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+#define INF_SYSTEM_UPDATE_STUB_IMPL_EVENT_CALLBACK_MAX 4
+
 typedef struct {
     bool                     update_available;
     dom_models_update_info_t update_info;
@@ -28,14 +30,17 @@ typedef struct {
     }
 
 typedef struct {
-    bool                     update_available;
-    dom_models_update_info_t update_info;
-    dom_models_error_t       update_result;
-    dom_models_error_t       validate_result;
-    dom_models_error_t       rollback_result;
-    size_t                   update_cnt;
-    size_t                   validate_cnt;
-    size_t                   rollback_cnt;
+    bool                               update_available;
+    dom_models_update_info_t           update_info;
+    dom_models_error_t                 update_result;
+    dom_models_error_t                 validate_result;
+    dom_models_error_t                 rollback_result;
+    size_t                             update_cnt;
+    size_t                             validate_cnt;
+    size_t                             rollback_cnt;
+    dom_models_update_event_callback_t event_cb_funcs[INF_SYSTEM_UPDATE_STUB_IMPL_EVENT_CALLBACK_MAX];
+    void*                              event_cb_ctxs[INF_SYSTEM_UPDATE_STUB_IMPL_EVENT_CALLBACK_MAX];
+    size_t                             event_cb_cnt;
 } inf_system_update_stub_impl_ctx_t;
 
 #ifdef __cplusplus

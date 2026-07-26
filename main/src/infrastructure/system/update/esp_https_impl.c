@@ -15,6 +15,13 @@
 #include "infrastructure/system/update/esp_https_impl_utils.h"
 #include "psa/crypto.h"
 
+/* Update Task Args */
+
+typedef struct {
+    inf_system_update_esp_https_impl_ctx_t* ctx;
+    dom_models_update_info_t                update_info;
+} update_task_args_t;
+
 /* Helper Function Prototypes */
 
 static void               abort_ota(inf_system_update_esp_https_impl_ctx_t* ctx);
@@ -25,6 +32,14 @@ static dom_models_error_t perform_update(
     inf_system_update_esp_https_impl_ctx_t* ctx,
     const dom_models_update_info_t*         update_info
 );
+static void dispatch_event(
+    inf_system_update_esp_https_impl_ctx_t* ctx,
+    dom_models_update_event_type_t          type,
+    dom_models_error_t                      result,
+    size_t                                  bytes_written,
+    size_t                                  total_bytes
+);
+static void update_task(void* pvParameters);
 
 /* Contract Function Prototypes */
 
@@ -37,6 +52,15 @@ static dom_models_error_t validate_impl(
 );
 static dom_models_error_t rollback_impl(
     dom_contracts_system_update_t* self
+);
+static dom_models_error_t add_event_callback_impl(
+    dom_contracts_system_update_t*     self,
+    void*                              cb_ctx,
+    dom_models_update_event_callback_t cb_func
+);
+static dom_models_error_t remove_event_callback_impl(
+    dom_contracts_system_update_t*     self,
+    dom_models_update_event_callback_t cb_func
 );
 
 /* Constructor and Destructor */
@@ -59,9 +83,11 @@ dom_contracts_system_update_t* inf_system_update_esp_https_impl_new(
         return NULL;
     }
 
-    self->update   = update_impl;
-    self->validate = validate_impl;
-    self->rollback = rollback_impl;
+    self->update                = update_impl;
+    self->validate              = validate_impl;
+    self->rollback              = rollback_impl;
+    self->add_event_callback    = add_event_callback_impl;
+    self->remove_event_callback = remove_event_callback_impl;
 
     return self;
 }
@@ -91,11 +117,35 @@ static dom_models_error_t update_impl(
     }
 
     inf_system_update_esp_https_impl_ctx_t* ctx = self->ctx;
-    if (ctx->ota_started) {
+    if (ctx->update_task_running) {
         return DOMAIN_MODELS_ERROR_BAD_STATE;
     }
 
-    return perform_update(ctx, update_info);
+    update_task_args_t* task_args = (update_task_args_t*)calloc(1, sizeof(update_task_args_t));
+    if (!task_args) {
+        return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
+    }
+
+    task_args->ctx = ctx;
+    memcpy(&task_args->update_info, update_info, sizeof(dom_models_update_info_t));
+
+    ctx->update_task_running = true;
+
+    BaseType_t created = xTaskCreate(
+        update_task,
+        "inf_system_update_task",
+        8192,
+        task_args,
+        5,
+        NULL
+    );
+    if (created != pdPASS) {
+        ctx->update_task_running = false;
+        free(task_args);
+        return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
+    }
+
+    return DOMAIN_MODELS_ERROR_OK;
 }
 
 static dom_models_error_t validate_impl(
@@ -141,6 +191,70 @@ static dom_models_error_t rollback_impl(
 #else
     return DOMAIN_MODELS_ERROR_BAD_STATE;
 #endif
+}
+
+static dom_models_error_t add_event_callback_impl(
+    dom_contracts_system_update_t*     self,
+    void*                              cb_ctx,
+    dom_models_update_event_callback_t cb_func
+) {
+    if (!self || !self->ctx || !cb_func) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_system_update_esp_https_impl_ctx_t* ctx = self->ctx;
+
+    for (size_t i = 0; i < ctx->event_cb_cnt; i++) {
+        if (ctx->event_cb_funcs[i] == cb_func) {
+            return DOMAIN_MODELS_ERROR_OK;
+        }
+    }
+
+    if (ctx->event_cb_cnt >= INF_SYSTEM_UPDATE_ESP_HTTPS_IMPL_EVENT_CALLBACK_MAX) {
+        return DOMAIN_MODELS_ERROR_BAD_STATE;
+    }
+
+    ctx->event_cb_funcs[ctx->event_cb_cnt] = cb_func;
+    ctx->event_cb_ctxs[ctx->event_cb_cnt]  = cb_ctx;
+    ctx->event_cb_cnt += 1;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t remove_event_callback_impl(
+    dom_contracts_system_update_t*     self,
+    dom_models_update_event_callback_t cb_func
+) {
+    if (!self || !self->ctx || !cb_func) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_system_update_esp_https_impl_ctx_t* ctx = self->ctx;
+
+    for (size_t i = 0; i < ctx->event_cb_cnt; i++) {
+        if (ctx->event_cb_funcs[i] != cb_func) {
+            continue;
+        }
+
+        size_t last_idx = ctx->event_cb_cnt - 1;
+
+        ctx->event_cb_funcs[i] = NULL;
+        ctx->event_cb_ctxs[i]  = NULL;
+
+        if (i != last_idx) {
+            ctx->event_cb_funcs[i] = ctx->event_cb_funcs[last_idx];
+            ctx->event_cb_ctxs[i]  = ctx->event_cb_ctxs[last_idx];
+
+            ctx->event_cb_funcs[last_idx] = NULL;
+            ctx->event_cb_ctxs[last_idx]  = NULL;
+        }
+
+        ctx->event_cb_cnt -= 1;
+
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    return DOMAIN_MODELS_ERROR_NOT_FOUND;
 }
 
 /* Helper Function Implementations */
@@ -322,6 +436,8 @@ static dom_models_error_t perform_update(
         }
 
         total_read += chunk_size;
+
+        dispatch_event(ctx, DOM_MODELS_UPDATE_EVENT_PROGRESS, DOMAIN_MODELS_ERROR_OK, total_read, update_info->firmware_size);
     }
 
     if (!esp_http_client_is_complete_data_received(client)) {
@@ -364,4 +480,45 @@ cleanup:
     free(read_buffer);
 
     return result;
+}
+
+static void dispatch_event(
+    inf_system_update_esp_https_impl_ctx_t* ctx,
+    dom_models_update_event_type_t          type,
+    dom_models_error_t                      result,
+    size_t                                  bytes_written,
+    size_t                                  total_bytes
+) {
+    if (!ctx) {
+        return;
+    }
+
+    dom_models_update_event_t event = {
+        .type          = type,
+        .result        = result,
+        .bytes_written = bytes_written,
+        .total_bytes   = total_bytes,
+    };
+
+    size_t cb_cnt = ctx->event_cb_cnt;
+    for (size_t i = 0; i < cb_cnt; i++) {
+        if (!ctx->event_cb_funcs[i]) {
+            continue;
+        }
+
+        ctx->event_cb_funcs[i](ctx->event_cb_ctxs[i], &event);
+    }
+}
+
+static void update_task(void* pvParameters) {
+    update_task_args_t*                     args = (update_task_args_t*)pvParameters;
+    inf_system_update_esp_https_impl_ctx_t* ctx  = args->ctx;
+
+    dom_models_error_t err = perform_update(ctx, &args->update_info);
+
+    ctx->update_task_running = false;
+    dispatch_event(ctx, DOM_MODELS_UPDATE_EVENT_COMPLETED, err, 0, 0);
+
+    free(args);
+    vTaskDelete(NULL);
 }
