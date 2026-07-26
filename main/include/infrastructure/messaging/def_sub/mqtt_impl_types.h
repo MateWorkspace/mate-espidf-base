@@ -15,7 +15,7 @@ typedef struct {
 
 #define INF_MESSAGING_DEF_SUB_MQTT_IMPL_CFG_DEFAULT() \
     {                                                 \
-        .mqtt_client = NULL,                         \
+        .mqtt_client = NULL,                          \
     }
 
 typedef struct {

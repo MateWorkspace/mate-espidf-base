@@ -18,12 +18,12 @@ typedef struct {
 
 #define INF_MESSAGING_DEF_PUB_MQTT_IMPL_CFG_DEFAULT() \
     {                                                 \
-        .mqtt_client = NULL,                         \
+        .mqtt_client = NULL,                          \
     }
 
 typedef struct {
     inf_messaging_def_pub_mqtt_impl_cfg_t cfg;
-    bool                                 connected;
+    bool                                  connected;
 } inf_messaging_def_pub_mqtt_impl_ctx_t;
 
 #ifdef __cplusplus

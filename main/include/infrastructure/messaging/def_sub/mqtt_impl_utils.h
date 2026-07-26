@@ -25,8 +25,8 @@ dom_models_error_t inf_messaging_def_sub_mqtt_impl_build_topic(
 
 dom_models_error_t inf_messaging_def_sub_mqtt_impl_subscribe_suffix(
     const inf_messaging_def_sub_mqtt_impl_ctx_t* ctx,
-    const char*                                 device_id,
-    const char*                                 suffix
+    const char*                                  device_id,
+    const char*                                  suffix
 );
 
 #ifdef __cplusplus

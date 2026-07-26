@@ -35,17 +35,17 @@ char* inf_messaging_def_pub_mqtt_impl_build_status_json(
 
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
-    const char*                                 topic,
-    char*                                       json,
-    int                                         qos
+    const char*                                  topic,
+    char*                                        json,
+    int                                          qos
 );
 
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_raw(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
-    const char*                                 topic,
-    const char*                                 data,
-    size_t                                      data_len,
-    int                                         qos
+    const char*                                  topic,
+    const char*                                  data,
+    size_t                                       data_len,
+    int                                          qos
 );
 
 #ifdef __cplusplus

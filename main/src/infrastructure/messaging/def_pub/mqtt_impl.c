@@ -130,7 +130,7 @@ static dom_models_error_t is_connected_impl(
     }
 
     inf_messaging_def_pub_mqtt_impl_ctx_t* ctx = self->ctx;
-    *out                                      = ctx->connected;
+    *out                                       = ctx->connected;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

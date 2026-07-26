@@ -17,7 +17,7 @@ typedef struct {
 } inf_messaging_def_pub_stub_impl_cfg_t;
 
 #define INF_MESSAGING_DEF_PUB_STUB_IMPL_CFG_DEFAULT() \
-    {                                                  \
+    {                                                 \
         .connected = true,                            \
     }
 
