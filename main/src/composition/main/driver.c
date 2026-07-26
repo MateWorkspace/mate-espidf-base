@@ -6,12 +6,15 @@
 #include "composition/main/preloaded.h"
 #include "composition/main/utils.h"
 #include "domain/models/preloaded.h"
+#include "esp_crt_bundle.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "mqtt_client.h"
 #include "nvs.h"
 #include "nvs_flash.h"
+
+#define CMP_MAIN_DRIVER_MQTT_PROTO_TLS "mqtts"
 
 /* Helper Function Prototypes */
 
@@ -142,6 +145,10 @@ static dom_models_error_t init_mqtt_client(cmp_main_launcher_t* launcher) {
         if (cmp_main_utils_cstr_available(dom_models_preloaded_data.mqtt_pass)) {
             mqtt_cfg.credentials.authentication.password = dom_models_preloaded_data.mqtt_pass;
         }
+    }
+
+    if (strcmp(dom_models_preloaded_data.mqtt_proto, CMP_MAIN_DRIVER_MQTT_PROTO_TLS) == 0) {
+        mqtt_cfg.broker.verification.crt_bundle_attach = esp_crt_bundle_attach;
     }
 
     launcher->driver.mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
