@@ -84,8 +84,8 @@ dom_models_error_t inf_repository_preloaded_stub_impl_load_cfg(inf_repository_pr
         return err;
     }
 
-    ctx->system_restart_after_ms = cfg->system_restart_after_ms;
-    ctx->wifi_sta_auto_reconnect = cfg->wifi_sta_auto_reconnect;
+    ctx->system_restart_after_ms      = cfg->system_restart_after_ms;
+    ctx->wifi_sta_try_connect_on_init = cfg->wifi_sta_try_connect_on_init;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

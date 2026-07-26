@@ -45,11 +45,11 @@ struct dom_usecases_internal_wifi_manager_t {
     dom_models_error_t (*forget_stored_credential)(
         dom_usecases_internal_wifi_manager_t* self
     );
-    dom_models_error_t (*get_auto_reconnect)(
+    dom_models_error_t (*get_try_connect_on_init)(
         dom_usecases_internal_wifi_manager_t* self,
         bool*                                 out
     );
-    dom_models_error_t (*set_auto_reconnect)(
+    dom_models_error_t (*set_try_connect_on_init)(
         dom_usecases_internal_wifi_manager_t* self,
         bool                                  enabled
     );
@@ -71,7 +71,7 @@ struct dom_usecases_internal_wifi_manager_stored_sta_t {
 struct dom_usecases_internal_wifi_manager_status_t {
     dom_models_wifi_status_t                        wifi;
     dom_usecases_internal_wifi_manager_stored_sta_t stored;
-    bool                                            auto_reconnect_enabled;
+    bool                                            try_connect_on_init_enabled;
     size_t                                          reconnect_trial_count;
     size_t                                          reconnect_max_trials;
 };

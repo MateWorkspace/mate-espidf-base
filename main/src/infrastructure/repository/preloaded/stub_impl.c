@@ -84,11 +84,11 @@ static dom_models_error_t set_system_restart_after_ms_impl(
     dom_contracts_repository_preloaded_t* self,
     uint32_t                              value
 );
-static dom_models_error_t get_wifi_sta_auto_reconnect_impl(
+static dom_models_error_t get_wifi_sta_try_connect_on_init_impl(
     dom_contracts_repository_preloaded_t* self,
     bool*                                 out
 );
-static dom_models_error_t set_wifi_sta_auto_reconnect_impl(
+static dom_models_error_t set_wifi_sta_try_connect_on_init_impl(
     dom_contracts_repository_preloaded_t* self,
     bool                                  value
 );
@@ -115,22 +115,22 @@ dom_contracts_repository_preloaded_t* inf_repository_preloaded_stub_impl_new(con
         return NULL;
     }
 
-    self->get_device_id               = get_device_id_impl;
-    self->get_device_id_str           = get_device_id_str_impl;
-    self->get_mqtt_proto              = get_mqtt_proto_impl;
-    self->set_mqtt_proto              = set_mqtt_proto_impl;
-    self->get_mqtt_host               = get_mqtt_host_impl;
-    self->set_mqtt_host               = set_mqtt_host_impl;
-    self->get_mqtt_port               = get_mqtt_port_impl;
-    self->set_mqtt_port               = set_mqtt_port_impl;
-    self->get_mqtt_user               = get_mqtt_user_impl;
-    self->set_mqtt_user               = set_mqtt_user_impl;
-    self->get_mqtt_pass               = get_mqtt_pass_impl;
-    self->set_mqtt_pass               = set_mqtt_pass_impl;
-    self->get_system_restart_after_ms = get_system_restart_after_ms_impl;
-    self->set_system_restart_after_ms = set_system_restart_after_ms_impl;
-    self->get_wifi_sta_auto_reconnect = get_wifi_sta_auto_reconnect_impl;
-    self->set_wifi_sta_auto_reconnect = set_wifi_sta_auto_reconnect_impl;
+    self->get_device_id                    = get_device_id_impl;
+    self->get_device_id_str                = get_device_id_str_impl;
+    self->get_mqtt_proto                   = get_mqtt_proto_impl;
+    self->set_mqtt_proto                   = set_mqtt_proto_impl;
+    self->get_mqtt_host                    = get_mqtt_host_impl;
+    self->set_mqtt_host                    = set_mqtt_host_impl;
+    self->get_mqtt_port                    = get_mqtt_port_impl;
+    self->set_mqtt_port                    = set_mqtt_port_impl;
+    self->get_mqtt_user                    = get_mqtt_user_impl;
+    self->set_mqtt_user                    = set_mqtt_user_impl;
+    self->get_mqtt_pass                    = get_mqtt_pass_impl;
+    self->set_mqtt_pass                    = set_mqtt_pass_impl;
+    self->get_system_restart_after_ms      = get_system_restart_after_ms_impl;
+    self->set_system_restart_after_ms      = set_system_restart_after_ms_impl;
+    self->get_wifi_sta_try_connect_on_init = get_wifi_sta_try_connect_on_init_impl;
+    self->set_wifi_sta_try_connect_on_init = set_wifi_sta_try_connect_on_init_impl;
 
     return self;
 }
@@ -369,7 +369,7 @@ static dom_models_error_t set_system_restart_after_ms_impl(
     return DOMAIN_MODELS_ERROR_OK;
 }
 
-static dom_models_error_t get_wifi_sta_auto_reconnect_impl(
+static dom_models_error_t get_wifi_sta_try_connect_on_init_impl(
     dom_contracts_repository_preloaded_t* self,
     bool*                                 out
 ) {
@@ -378,12 +378,12 @@ static dom_models_error_t get_wifi_sta_auto_reconnect_impl(
     }
 
     inf_repository_preloaded_stub_impl_ctx_t* ctx = self->ctx;
-    *out                                          = ctx->wifi_sta_auto_reconnect;
+    *out                                          = ctx->wifi_sta_try_connect_on_init;
 
     return DOMAIN_MODELS_ERROR_OK;
 }
 
-static dom_models_error_t set_wifi_sta_auto_reconnect_impl(
+static dom_models_error_t set_wifi_sta_try_connect_on_init_impl(
     dom_contracts_repository_preloaded_t* self,
     bool                                  value
 ) {
@@ -392,7 +392,7 @@ static dom_models_error_t set_wifi_sta_auto_reconnect_impl(
     }
 
     inf_repository_preloaded_stub_impl_ctx_t* ctx = self->ctx;
-    ctx->wifi_sta_auto_reconnect                  = value;
+    ctx->wifi_sta_try_connect_on_init                  = value;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

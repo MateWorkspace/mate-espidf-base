@@ -17,20 +17,20 @@ typedef struct {
     const char* mqtt_user;
     const char* mqtt_pass;
     uint32_t    system_restart_after_ms;
-    bool        wifi_sta_auto_reconnect;
+    bool        wifi_sta_try_connect_on_init;
 } inf_repository_preloaded_stub_impl_cfg_t;
 
-#define INF_REPOSITORY_PRELOADED_STUB_IMPL_CFG_DEFAULT() \
-    {                                                    \
-        .device_id               = 0x020000000001ULL,    \
-        .device_id_str           = "020000000001",       \
-        .mqtt_proto              = "mqtt",               \
-        .mqtt_host               = "127.0.0.1",          \
-        .mqtt_port               = "1883",               \
-        .mqtt_user               = "",                   \
-        .mqtt_pass               = "",                   \
-        .system_restart_after_ms = 0,                    \
-        .wifi_sta_auto_reconnect = false,                \
+#define INF_REPOSITORY_PRELOADED_STUB_IMPL_CFG_DEFAULT()      \
+    {                                                         \
+        .device_id                    = 0x020000000001ULL,    \
+        .device_id_str                = "020000000001",       \
+        .mqtt_proto                   = "mqtt",               \
+        .mqtt_host                    = "127.0.0.1",          \
+        .mqtt_port                    = "1883",               \
+        .mqtt_user                    = "",                   \
+        .mqtt_pass                    = "",                   \
+        .system_restart_after_ms      = 0,                    \
+        .wifi_sta_try_connect_on_init = false,                \
     }
 
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
     char*    mqtt_user;
     char*    mqtt_pass;
     uint32_t system_restart_after_ms;
-    bool     wifi_sta_auto_reconnect;
+    bool     wifi_sta_try_connect_on_init;
 } inf_repository_preloaded_stub_impl_ctx_t;
 
 #ifdef __cplusplus

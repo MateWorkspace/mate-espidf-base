@@ -78,11 +78,11 @@ struct dom_contracts_repository_preloaded_t {
         dom_contracts_repository_preloaded_t* self,
         uint32_t                              value
     );
-    dom_models_error_t (*get_wifi_sta_auto_reconnect)(
+    dom_models_error_t (*get_wifi_sta_try_connect_on_init)(
         dom_contracts_repository_preloaded_t* self,
         bool*                                 out
     );
-    dom_models_error_t (*set_wifi_sta_auto_reconnect)(
+    dom_models_error_t (*set_wifi_sta_try_connect_on_init)(
         dom_contracts_repository_preloaded_t* self,
         bool                                  value
     );
