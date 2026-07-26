@@ -84,6 +84,14 @@ static dom_models_error_t set_system_restart_after_ms_impl(
     dom_contracts_repository_preloaded_t* self,
     uint32_t                              value
 );
+static dom_models_error_t get_wifi_sta_auto_reconnect_impl(
+    dom_contracts_repository_preloaded_t* self,
+    bool*                                 out
+);
+static dom_models_error_t set_wifi_sta_auto_reconnect_impl(
+    dom_contracts_repository_preloaded_t* self,
+    bool                                  value
+);
 
 /* Constructor and Destructor */
 
@@ -121,6 +129,8 @@ dom_contracts_repository_preloaded_t* inf_repository_preloaded_stub_impl_new(con
     self->set_mqtt_pass               = set_mqtt_pass_impl;
     self->get_system_restart_after_ms = get_system_restart_after_ms_impl;
     self->set_system_restart_after_ms = set_system_restart_after_ms_impl;
+    self->get_wifi_sta_auto_reconnect = get_wifi_sta_auto_reconnect_impl;
+    self->set_wifi_sta_auto_reconnect = set_wifi_sta_auto_reconnect_impl;
 
     return self;
 }
@@ -355,6 +365,34 @@ static dom_models_error_t set_system_restart_after_ms_impl(
 
     inf_repository_preloaded_stub_impl_ctx_t* ctx = self->ctx;
     ctx->system_restart_after_ms                  = value;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t get_wifi_sta_auto_reconnect_impl(
+    dom_contracts_repository_preloaded_t* self,
+    bool*                                 out
+) {
+    if (!self || !self->ctx || !out) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_repository_preloaded_stub_impl_ctx_t* ctx = self->ctx;
+    *out                                          = ctx->wifi_sta_auto_reconnect;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t set_wifi_sta_auto_reconnect_impl(
+    dom_contracts_repository_preloaded_t* self,
+    bool                                  value
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_repository_preloaded_stub_impl_ctx_t* ctx = self->ctx;
+    ctx->wifi_sta_auto_reconnect                  = value;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

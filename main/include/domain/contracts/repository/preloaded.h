@@ -1,6 +1,7 @@
 #ifndef DOMAIN_CONTRACTS_REPOSITORY_PRELOADED_H
 #define DOMAIN_CONTRACTS_REPOSITORY_PRELOADED_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -23,15 +24,6 @@ struct dom_contracts_repository_preloaded_t {
         dom_contracts_repository_preloaded_t* self,
         char*                                 out,
         size_t                                out_size
-    );
-    dom_models_error_t (*get_wifi_ap_pass)(
-        dom_contracts_repository_preloaded_t* self,
-        char*                                 out,
-        size_t                                out_size
-    );
-    dom_models_error_t (*set_wifi_ap_pass)(
-        dom_contracts_repository_preloaded_t* self,
-        const char*                           value
     );
     dom_models_error_t (*get_mqtt_proto)(
         dom_contracts_repository_preloaded_t* self,
@@ -85,6 +77,14 @@ struct dom_contracts_repository_preloaded_t {
     dom_models_error_t (*set_system_restart_after_ms)(
         dom_contracts_repository_preloaded_t* self,
         uint32_t                              value
+    );
+    dom_models_error_t (*get_wifi_sta_auto_reconnect)(
+        dom_contracts_repository_preloaded_t* self,
+        bool*                                 out
+    );
+    dom_models_error_t (*set_wifi_sta_auto_reconnect)(
+        dom_contracts_repository_preloaded_t* self,
+        bool                                  value
     );
 };
 

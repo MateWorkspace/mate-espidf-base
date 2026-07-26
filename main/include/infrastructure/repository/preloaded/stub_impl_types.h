@@ -1,6 +1,7 @@
 #ifndef INFRASTRUCTURE_REPOSITORY_PRELOADED_STUB_IMPL_TYPES_H
 #define INFRASTRUCTURE_REPOSITORY_PRELOADED_STUB_IMPL_TYPES_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -16,6 +17,7 @@ typedef struct {
     const char* mqtt_user;
     const char* mqtt_pass;
     uint32_t    system_restart_after_ms;
+    bool        wifi_sta_auto_reconnect;
 } inf_repository_preloaded_stub_impl_cfg_t;
 
 #define INF_REPOSITORY_PRELOADED_STUB_IMPL_CFG_DEFAULT() \
@@ -28,6 +30,7 @@ typedef struct {
         .mqtt_user               = "",                   \
         .mqtt_pass               = "",                   \
         .system_restart_after_ms = 0,                    \
+        .wifi_sta_auto_reconnect = false,                \
     }
 
 typedef struct {
@@ -39,6 +42,7 @@ typedef struct {
     char*    mqtt_user;
     char*    mqtt_pass;
     uint32_t system_restart_after_ms;
+    bool     wifi_sta_auto_reconnect;
 } inf_repository_preloaded_stub_impl_ctx_t;
 
 #ifdef __cplusplus

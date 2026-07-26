@@ -19,6 +19,7 @@
 #define DEFAULT_MQTT_USER               ""
 #define DEFAULT_MQTT_PASS               ""
 #define DEFAULT_SYSTEM_RESTART_AFTER_MS 0xFFFFFFFF
+#define DEFAULT_WIFI_STA_AUTO_RECONNECT false
 
 #define DEVICE_ID_STR_LEN 12
 
@@ -88,6 +89,15 @@ dom_models_error_t cmp_main_preloaded_load_from_nvs(nvs_handle_t nvs) {
         return error_from_esp(nvs_err);
     }
 
+    uint8_t wifi_auto_rc = DEFAULT_WIFI_STA_AUTO_RECONNECT ? 1 : 0;
+    nvs_err              = nvs_get_u8(nvs, DOMAIN_MODELS_PRELOADED_WIFI_STA_AUTO_RECONNECT_KEY, &wifi_auto_rc);
+    if (nvs_err == ESP_OK) {
+        dom_models_preloaded_data.wifi_sta_auto_reconnect = wifi_auto_rc != 0;
+    } else if (nvs_err != ESP_ERR_NVS_NOT_FOUND) {
+        clear_preloaded();
+        return error_from_esp(nvs_err);
+    }
+
 #ifdef COMPOSITION_MAIN_CONFIG_PRELOADED_WIFI_AP_SSID_USE_DEVICE_ID
     err = apply_wifi_ap_ssid_device_id_suffix();
     if (err != DOMAIN_MODELS_ERROR_OK) {
@@ -139,6 +149,8 @@ static dom_models_error_t load_default(void) {
     }
 
     dom_models_preloaded_data.system_restart_after_ms = DEFAULT_SYSTEM_RESTART_AFTER_MS;
+
+    dom_models_preloaded_data.wifi_sta_auto_reconnect = DEFAULT_WIFI_STA_AUTO_RECONNECT;
 
     return DOMAIN_MODELS_ERROR_OK;
 }
