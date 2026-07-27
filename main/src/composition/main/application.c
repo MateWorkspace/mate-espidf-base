@@ -43,7 +43,12 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
-    dom_models_error_t err = launcher->application.wifi_manager->start(launcher->application.wifi_manager);
+    dom_models_error_t err = app_internal_wifi_manager_impl_init(launcher->application.wifi_manager);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    err = launcher->application.wifi_manager->start(launcher->application.wifi_manager);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return err;
     }
@@ -76,6 +81,7 @@ void cmp_main_application_deinit(cmp_main_launcher_t* launcher) {
 
     if (launcher->application.wifi_manager) {
         (void)launcher->application.wifi_manager->stop(launcher->application.wifi_manager);
+        app_internal_wifi_manager_impl_deinit(launcher->application.wifi_manager);
         app_internal_wifi_manager_impl_delete(launcher->application.wifi_manager);
         launcher->application.wifi_manager = NULL;
     }

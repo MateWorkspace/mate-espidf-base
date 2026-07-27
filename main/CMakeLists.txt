@@ -43,6 +43,6 @@ idf_component_register(
 target_compile_definitions(
     ${COMPONENT_LIB}
     PRIVATE
-        PROJECT_NAME="${APP_NAME}"
+        PROJECT_NAME="${CMAKE_PROJECT_NAME}"
         PROJECT_VERSION="${PROJECT_VERSION}"
 )

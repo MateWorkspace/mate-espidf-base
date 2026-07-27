@@ -63,6 +63,19 @@ static dom_models_error_t try_reconnect_impl(
     dom_usecases_internal_wifi_manager_t* self,
     bool*                                 attempted
 );
+static dom_models_error_t add_status_callback_impl(
+    dom_usecases_internal_wifi_manager_t* self,
+    void*                                 cb_ctx,
+    dom_models_wifi_event_callback_t      cb_func
+);
+static dom_models_error_t remove_status_callback_impl(
+    dom_usecases_internal_wifi_manager_t* self,
+    dom_models_wifi_event_callback_t      cb_func
+);
+
+/* Event Handler Prototype */
+
+static void on_wifi_event(void* cb_ctx, const dom_models_wifi_event_t* event);
 
 /* Constructor and Destructor */
 
@@ -102,6 +115,8 @@ dom_usecases_internal_wifi_manager_t* app_internal_wifi_manager_impl_new(const a
     self->set_try_connect_on_init  = set_try_connect_on_init_impl;
     self->need_reconnect           = need_reconnect_impl;
     self->try_reconnect            = try_reconnect_impl;
+    self->add_status_callback      = add_status_callback_impl;
+    self->remove_status_callback   = remove_status_callback_impl;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi manager created successfully");
 
@@ -122,6 +137,46 @@ void app_internal_wifi_manager_impl_delete(dom_usecases_internal_wifi_manager_t*
     }
 
     dom_usecases_internal_wifi_manager_delete(self);
+}
+
+dom_models_error_t app_internal_wifi_manager_impl_init(dom_usecases_internal_wifi_manager_t* self) {
+    const char* tag = BASE_TAG "/init";
+
+    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
+    dom_models_error_t                    err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    if (ctx->event_subscribed) {
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    err = ctx->cfg.wifi->add_event_callback(ctx->cfg.wifi, ctx, on_wifi_event);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to WiFi events: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    ctx->event_subscribed = true;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi manager initialized successfully");
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+void app_internal_wifi_manager_impl_deinit(dom_usecases_internal_wifi_manager_t* self) {
+    const char* tag = BASE_TAG "/deinit";
+
+    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
+    if (get_ctx(self, &ctx) != DOMAIN_MODELS_ERROR_OK || !ctx->event_subscribed) {
+        return;
+    }
+
+    ctx->cfg.wifi->remove_event_callback(ctx->cfg.wifi, on_wifi_event);
+    ctx->event_subscribed = false;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi manager deinitialized successfully");
 }
 
 /* Contract Function Implementations */
@@ -536,6 +591,125 @@ static dom_models_error_t try_reconnect_impl(
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "STA reconnect request accepted successfully");
 
     return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t add_status_callback_impl(
+    dom_usecases_internal_wifi_manager_t* self,
+    void*                                 cb_ctx,
+    dom_models_wifi_event_callback_t      cb_func
+) {
+    const char* tag = BASE_TAG "/add_status_callback";
+
+    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
+    dom_models_error_t                    err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    if (!cb_func) {
+        err = DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Missing status callback function: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    if (ctx->status_cb_idx >= APPLICATION_INTERNAL_WIFI_MANAGER_IMPL_STATUS_CB_MAX_CNT) {
+        err = DOMAIN_MODELS_ERROR_BAD_STATE;
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "No room left for another status callback: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    ctx->status_cb_funcs[ctx->status_cb_idx] = cb_func;
+    ctx->status_cb_ctxs[ctx->status_cb_idx]  = cb_ctx;
+    ctx->status_cb_idx += 1;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t remove_status_callback_impl(
+    dom_usecases_internal_wifi_manager_t* self,
+    dom_models_wifi_event_callback_t      cb_func
+) {
+    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
+    dom_models_error_t                    err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    if (!cb_func || ctx->status_cb_idx == 0) {
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    for (unsigned int i = 0; i < ctx->status_cb_idx; i++) {
+        if (ctx->status_cb_funcs[i] != cb_func) {
+            continue;
+        }
+
+        unsigned int last_idx = ctx->status_cb_idx - 1;
+
+        ctx->status_cb_funcs[i] = NULL;
+        ctx->status_cb_ctxs[i]  = NULL;
+
+        if (i != last_idx) {
+            ctx->status_cb_funcs[i] = ctx->status_cb_funcs[last_idx];
+            ctx->status_cb_ctxs[i]  = ctx->status_cb_ctxs[last_idx];
+
+            ctx->status_cb_funcs[last_idx] = NULL;
+            ctx->status_cb_ctxs[last_idx]  = NULL;
+        }
+
+        ctx->status_cb_idx -= 1;
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+/* Event Handler Implementation */
+
+static void on_wifi_event(void* cb_ctx, const dom_models_wifi_event_t* event) {
+    if (!cb_ctx || !event) {
+        return;
+    }
+
+    app_internal_wifi_manager_impl_ctx_t* ctx = cb_ctx;
+    const char*                           tag = BASE_TAG "/on_wifi_event";
+
+    /* Always-on internal observability: log connect/disconnect regardless
+       of whether anything is externally subscribed. */
+    switch (event->type) {
+        case DOM_MODELS_WIFI_EVENT_STA_GOT_IP: {
+            dom_models_wifi_status_t status;
+            if (ctx->cfg.wifi->get_status(ctx->cfg.wifi, &status) == DOMAIN_MODELS_ERROR_OK) {
+                ctx->cfg.logger->info(
+                    ctx->cfg.logger,
+                    tag,
+                    "WiFi connected, IP: %u.%u.%u.%u",
+                    status.sta_ipv4[0],
+                    status.sta_ipv4[1],
+                    status.sta_ipv4[2],
+                    status.sta_ipv4[3]
+                );
+            } else {
+                ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi connected");
+            }
+            break;
+        }
+        case DOM_MODELS_WIFI_EVENT_STA_DISCONNECTED:
+            ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi disconnected");
+            break;
+        case DOM_MODELS_WIFI_EVENT_STA_CONNECTED:
+        default:
+            /* Link layer only, no IP yet - skip to avoid a noisy duplicate
+               line right before STA_GOT_IP. */
+            break;
+    }
+
+    /* Fan out to external subscribers (e.g. the BLE WiFi handler). */
+    for (unsigned int i = 0; i < ctx->status_cb_idx; i++) {
+        if (ctx->status_cb_funcs[i]) {
+            ctx->status_cb_funcs[i](ctx->status_cb_ctxs[i], event);
+        }
+    }
 }
 
 /* Helper Function Implementations */

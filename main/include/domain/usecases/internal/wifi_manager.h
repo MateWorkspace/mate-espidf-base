@@ -61,6 +61,15 @@ struct dom_usecases_internal_wifi_manager_t {
         dom_usecases_internal_wifi_manager_t* self,
         bool*                                 attempted
     );
+    dom_models_error_t (*add_status_callback)(
+        dom_usecases_internal_wifi_manager_t* self,
+        void*                                 cb_ctx,
+        dom_models_wifi_event_callback_t      cb_func
+    );
+    dom_models_error_t (*remove_status_callback)(
+        dom_usecases_internal_wifi_manager_t* self,
+        dom_models_wifi_event_callback_t      cb_func
+    );
 };
 
 struct dom_usecases_internal_wifi_manager_stored_sta_t {

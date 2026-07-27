@@ -41,6 +41,19 @@ dom_models_error_t cmp_main_utils_build_mqtt_broker_uri(char* out, size_t out_si
     return DOMAIN_MODELS_ERROR_OK;
 }
 
+dom_models_error_t cmp_main_utils_build_ble_device_name(char* out, size_t out_size) {
+    if (!out || out_size == 0) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    int written = snprintf(out, out_size, "%s-%s", PROJECT_NAME, dom_models_preloaded_data.device_id_str);
+    if (written <= 0 || (size_t)written >= out_size) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
 dom_models_error_t cmp_main_utils_build_mqtt_lwt_topic(char* out, size_t out_size) {
     if (!out || out_size == 0) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;

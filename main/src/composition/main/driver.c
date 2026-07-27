@@ -10,9 +10,13 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
+#include "host/ble_hs.h"
 #include "mqtt_client.h"
+#include "nimble/nimble_port.h"
 #include "nvs.h"
 #include "nvs_flash.h"
+#include "services/gap/ble_svc_gap.h"
+#include "services/gatt/ble_svc_gatt.h"
 
 #define CMP_MAIN_DRIVER_MQTT_PROTO_TLS "mqtts"
 
@@ -20,6 +24,7 @@
 
 static dom_models_error_t init_nvs(cmp_main_launcher_t* launcher);
 static dom_models_error_t init_mqtt_client(cmp_main_launcher_t* launcher);
+static dom_models_error_t init_ble(cmp_main_launcher_t* launcher);
 
 /* Constructor and Destructor */
 
@@ -54,6 +59,11 @@ dom_models_error_t cmp_main_driver_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_FAILURE;
     }
 
+    err = init_ble(launcher);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     err = init_mqtt_client(launcher);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return err;
@@ -72,6 +82,8 @@ void cmp_main_driver_deinit(cmp_main_launcher_t* launcher) {
         esp_mqtt_client_destroy(launcher->driver.mqtt_client);
         launcher->driver.mqtt_client = NULL;
     }
+
+    nimble_port_deinit();
 
     esp_wifi_deinit();
     esp_netif_deinit();
@@ -102,6 +114,31 @@ static dom_models_error_t init_nvs(cmp_main_launcher_t* launcher) {
 
     esp_err = nvs_open("mate", NVS_READWRITE, &launcher->driver.nvs);
     if (esp_err != ESP_OK) {
+        return DOMAIN_MODELS_ERROR_FAILURE;
+    }
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t init_ble(cmp_main_launcher_t* launcher) {
+    (void)launcher;
+
+    esp_err_t esp_err = nimble_port_init();
+    if (esp_err != ESP_OK) {
+        return DOMAIN_MODELS_ERROR_FAILURE;
+    }
+
+    ble_svc_gap_init();
+    ble_svc_gatt_init();
+
+    char device_name[40];
+    dom_models_error_t err = cmp_main_utils_build_ble_device_name(device_name, sizeof(device_name));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    int rc = ble_svc_gap_device_name_set(device_name);
+    if (rc != 0) {
         return DOMAIN_MODELS_ERROR_FAILURE;
     }
 

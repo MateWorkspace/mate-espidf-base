@@ -12,6 +12,10 @@ dom_usecases_internal_wifi_manager_t* app_internal_wifi_manager_impl_new(const a
 
 void app_internal_wifi_manager_impl_delete(dom_usecases_internal_wifi_manager_t* self);
 
+dom_models_error_t app_internal_wifi_manager_impl_init(dom_usecases_internal_wifi_manager_t* self);
+
+void app_internal_wifi_manager_impl_deinit(dom_usecases_internal_wifi_manager_t* self);
+
 #ifdef __cplusplus
 }
 #endif

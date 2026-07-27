@@ -16,6 +16,11 @@
 #include "domain/usecases/internal/wifi_manager.h"
 #include "mqtt_client.h"
 #include "nvs.h"
+#include "presentation/ble/gatt/registry.h"
+#include "presentation/ble/handler/log/handler.h"
+#include "presentation/ble/handler/settings/handler.h"
+#include "presentation/ble/handler/wifi_manager/handler.h"
+#include "presentation/ble/host.h"
 #include "presentation/mqtt/context.h"
 #include "presentation/task/wifi_sta_reconnect/task.h"
 
@@ -48,8 +53,13 @@ typedef struct {
 } cmp_main_launcher_application_t;
 
 typedef struct {
-    pres_mqtt_context_t*            mqtt_context;
-    pres_task_wifi_sta_reconnect_t* wifi_sta_reconnect_task;
+    pres_mqtt_context_t*             mqtt_context;
+    pres_task_wifi_sta_reconnect_t*  wifi_sta_reconnect_task;
+    pres_ble_gatt_registry_t*        ble_gatt_registry;
+    pres_ble_handler_settings_t*     ble_settings;
+    pres_ble_handler_wifi_manager_t* ble_wifi_manager;
+    pres_ble_handler_log_t*          ble_log;
+    pres_ble_host_t*                 ble_host;
 } cmp_main_launcher_presentation_t;
 
 typedef struct {

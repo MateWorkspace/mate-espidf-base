@@ -7,10 +7,13 @@
 #include "domain/contracts/logger/leveled.h"
 #include "domain/contracts/repository/preloaded.h"
 #include "domain/contracts/repository/wifi.h"
+#include "domain/models/wifi.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define APPLICATION_INTERNAL_WIFI_MANAGER_IMPL_STATUS_CB_MAX_CNT 2
 
 typedef struct {
     dom_contracts_logger_leveled_t*       logger;
@@ -22,6 +25,10 @@ typedef struct {
 typedef struct {
     app_internal_wifi_manager_impl_cfg_t cfg;
     bool                                 connect_attempted;
+    bool                                 event_subscribed;
+    dom_models_wifi_event_callback_t     status_cb_funcs[APPLICATION_INTERNAL_WIFI_MANAGER_IMPL_STATUS_CB_MAX_CNT];
+    void*                                status_cb_ctxs[APPLICATION_INTERNAL_WIFI_MANAGER_IMPL_STATUS_CB_MAX_CNT];
+    unsigned int                         status_cb_idx;
 } app_internal_wifi_manager_impl_ctx_t;
 
 #ifdef __cplusplus
