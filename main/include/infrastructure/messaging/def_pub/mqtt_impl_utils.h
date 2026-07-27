@@ -45,7 +45,8 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
     const char*                                  topic,
     char*                                        json,
-    int                                          qos
+    int                                          qos,
+    bool                                          retain
 );
 
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_raw(

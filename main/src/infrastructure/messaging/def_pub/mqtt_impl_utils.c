@@ -120,7 +120,8 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
     const char*                                  topic,
     char*                                        json,
-    int                                          qos
+    int                                          qos,
+    bool                                          retain
 ) {
     if (!ctx || !ctx->cfg.mqtt_client || !cstr_available(topic)) {
         if (json) {
@@ -138,7 +139,7 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
-    int msg_id = esp_mqtt_client_publish(ctx->cfg.mqtt_client, topic, json, (int)len, qos, 0);
+    int msg_id = esp_mqtt_client_publish(ctx->cfg.mqtt_client, topic, json, (int)len, qos, retain ? 1 : 0);
     cJSON_free(json);
     if (msg_id < 0) {
         return DOMAIN_MODELS_ERROR_FAILURE;

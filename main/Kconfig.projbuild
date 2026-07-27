@@ -1,0 +1,21 @@
+menu "Mate Test Seed"
+
+    config MATE_TEST_SEED_NVS_ON_BOOT
+        bool "Seed NVS with test WiFi/MQTT credentials on boot, then halt"
+        default n
+        help
+            For hardware testing only. When enabled, app_main() runs
+            cmp_test_seed_run() instead of the normal cmp_main_launcher():
+            it writes a fixed set of WiFi STA credentials and MQTT broker
+            settings into the "mate" NVS namespace (the same one the real
+            app reads via the preloaded/wifi repositories), then halts.
+
+            The NVS partition is untouched by a normal `idf.py flash` (only
+            bootloader/partition-table/app regions are written), so the
+            workflow is: build+flash this seed variant once, let it run to
+            completion, then reflash the normal firmware - it will boot
+            with the seeded credentials already in NVS.
+
+            Never enable this for a real deployment build.
+
+endmenu

@@ -160,7 +160,8 @@ static dom_models_error_t registration_impl(
         ctx,
         "/pub/registration",
         inf_messaging_def_pub_mqtt_impl_build_registration_json(device_id, device_info, firmware_name),
-        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT
+        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
+        false
     );
 }
 
@@ -185,7 +186,11 @@ static dom_models_error_t status_impl(
         ctx,
         topic,
         inf_messaging_def_pub_mqtt_impl_build_status_json(status),
-        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT
+        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
+        true /* retained: mirrors the LWT's OFFLINE retain so a fresh
+                subscriber (e.g. the backend after its own restart) gets
+                the device's current status immediately, not just future
+                updates */
     );
 }
 
@@ -239,6 +244,7 @@ static dom_models_error_t action_ack_impl(
         ctx,
         topic,
         inf_messaging_def_pub_mqtt_impl_build_action_ack_json(execution_id, status, message),
-        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT
+        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
+        false
     );
 }
