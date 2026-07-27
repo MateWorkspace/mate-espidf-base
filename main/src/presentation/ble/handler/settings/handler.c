@@ -7,13 +7,13 @@
 #include "host/ble_att.h"
 #include "host/ble_gatt.h"
 #include "host/ble_hs.h"
-#include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/gatt/util.h"
+#include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/settings/dto.h"
 
-#define BASE_TAG "ble/handler/settings"
-#define UPDATE_PAYLOAD_MAX_LEN 384
-#define SNAPSHOT_JSON_MAX_LEN  512
+#define BASE_TAG                      "ble/handler/settings"
+#define UPDATE_PAYLOAD_MAX_LEN        384
+#define SNAPSHOT_JSON_MAX_LEN         512
 #define RESTART_REQUIRED_JSON_MAX_LEN 48
 
 /* Global-lifetime GATT storage - NimBLE retains raw pointers into these
@@ -207,8 +207,8 @@ static int restart_required_access_callback(
         return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
     }
 
-    bool                restart_required = false;
-    dom_models_error_t  err               = self->cfg.settings->get_restart_required(self->cfg.settings, &restart_required);
+    bool               restart_required = false;
+    dom_models_error_t err              = self->cfg.settings->get_restart_required(self->cfg.settings, &restart_required);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return BLE_ATT_ERR_UNLIKELY;
     }

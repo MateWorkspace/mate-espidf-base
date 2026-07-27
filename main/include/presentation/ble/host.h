@@ -30,7 +30,7 @@ typedef struct {
 } pres_ble_host_cfg_t;
 
 typedef struct {
-    pres_ble_host_cfg_t       cfg;
+    pres_ble_host_cfg_t        cfg;
     bool                       started;
     pres_ble_host_gap_event_cb gap_event_cb_funcs[PRES_BLE_HOST_GAP_EVENT_CB_MAX_CNT];
     void*                      gap_event_cb_ctxs[PRES_BLE_HOST_GAP_EVENT_CB_MAX_CNT];

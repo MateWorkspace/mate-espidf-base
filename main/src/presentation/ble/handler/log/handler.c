@@ -8,8 +8,8 @@
 #include "host/ble_gap.h"
 #include "host/ble_gatt.h"
 #include "host/ble_hs.h"
-#include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/gatt/util.h"
+#include "presentation/ble/gatt/uuid.h"
 
 #define BASE_TAG "ble/handler/log"
 

@@ -12,8 +12,8 @@ static void format_ipv4(const uint8_t ip[4], char* buf, size_t buf_cap) {
 
 size_t pres_ble_handler_wifi_manager_dto_encode_status(
     const dom_usecases_internal_wifi_manager_status_t* status,
-    char*                                                buf,
-    size_t                                                buf_cap
+    char*                                              buf,
+    size_t                                             buf_cap
 ) {
     if (!status || !buf || buf_cap == 0) {
         return 0;
@@ -56,8 +56,8 @@ size_t pres_ble_handler_wifi_manager_dto_encode_status(
 
 size_t pres_ble_handler_wifi_manager_dto_encode_stored_credential(
     const dom_usecases_internal_wifi_manager_stored_sta_t* stored,
-    char*                                                    buf,
-    size_t                                                    buf_cap
+    char*                                                  buf,
+    size_t                                                 buf_cap
 ) {
     if (!stored || !buf || buf_cap == 0) {
         return 0;
@@ -78,8 +78,8 @@ size_t pres_ble_handler_wifi_manager_dto_encode_stored_credential(
 }
 
 dom_models_error_t pres_ble_handler_wifi_manager_dto_decode_connect(
-    const char*                            json,
-    size_t                                  json_len,
+    const char*                           json,
+    size_t                                json_len,
     dom_models_wifi_sta_connect_config_t* out
 ) {
     if (!json || !out) {

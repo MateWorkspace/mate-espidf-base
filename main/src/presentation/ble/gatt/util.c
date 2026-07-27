@@ -32,7 +32,7 @@ int pres_ble_gatt_util_read_write_payload(
         return BLE_ATT_ERR_INVALID_HANDLE;
     }
 
-    uint16_t om_len = OS_MBUF_PKTLEN(ctxt->om);
+    uint16_t om_len   = OS_MBUF_PKTLEN(ctxt->om);
     size_t   copy_len = (size_t)om_len < (buf_cap - 1) ? (size_t)om_len : (buf_cap - 1);
 
     int rc = ble_hs_mbuf_to_flat(ctxt->om, buf, copy_len, NULL);

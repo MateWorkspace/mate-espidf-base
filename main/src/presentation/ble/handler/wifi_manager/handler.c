@@ -7,13 +7,13 @@
 #include "host/ble_att.h"
 #include "host/ble_gatt.h"
 #include "host/ble_hs.h"
-#include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/gatt/util.h"
+#include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/wifi_manager/dto.h"
 
-#define BASE_TAG "ble/handler/wifi_manager"
-#define CONNECT_PAYLOAD_MAX_LEN 160
-#define STATUS_JSON_MAX_LEN     256
+#define BASE_TAG                       "ble/handler/wifi_manager"
+#define CONNECT_PAYLOAD_MAX_LEN        160
+#define STATUS_JSON_MAX_LEN            256
 #define STORED_CREDENTIAL_JSON_MAX_LEN 96
 
 /* Global-lifetime GATT storage, same rationale as the settings handler
@@ -288,7 +288,7 @@ static int stored_credential_access_callback(
     }
 
     dom_usecases_internal_wifi_manager_stored_sta_t stored;
-    dom_models_error_t                               err = self->cfg.wifi_manager->get_stored_credential(self->cfg.wifi_manager, &stored);
+    dom_models_error_t                              err = self->cfg.wifi_manager->get_stored_credential(self->cfg.wifi_manager, &stored);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return BLE_ATT_ERR_UNLIKELY;
     }
@@ -317,8 +317,8 @@ static int try_connect_on_init_access_callback(
     }
 
     if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
-        bool                enabled = false;
-        dom_models_error_t  err     = self->cfg.wifi_manager->get_try_connect_on_init(self->cfg.wifi_manager, &enabled);
+        bool               enabled = false;
+        dom_models_error_t err     = self->cfg.wifi_manager->get_try_connect_on_init(self->cfg.wifi_manager, &enabled);
         if (err != DOMAIN_MODELS_ERROR_OK) {
             return BLE_ATT_ERR_UNLIKELY;
         }

@@ -18,15 +18,15 @@ extern "C" {
 
 size_t pres_ble_handler_settings_dto_encode_snapshot(
     const dom_usecases_internal_settings_snapshot_t* snapshot,
-    char*                                             buf,
-    size_t                                             buf_cap
+    char*                                            buf,
+    size_t                                           buf_cap
 );
 
 size_t pres_ble_handler_settings_dto_encode_restart_required(bool restart_required, char* buf, size_t buf_cap);
 
 dom_models_error_t pres_ble_handler_settings_dto_decode_update(
-    const char*                                          json,
-    size_t                                                json_len,
+    const char*                                        json,
+    size_t                                             json_len,
     dom_usecases_internal_settings_preloaded_update_t* out
 );
 

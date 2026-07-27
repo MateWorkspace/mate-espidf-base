@@ -20,8 +20,8 @@ typedef struct {
 
 typedef struct pres_ble_handler_settings_t {
     pres_ble_handler_settings_cfg_t cfg;
-    bool                             registered;
-    uint16_t                         restart_required_chr_hdl;
+    bool                            registered;
+    uint16_t                        restart_required_chr_hdl;
 } pres_ble_handler_settings_t;
 
 #ifdef __cplusplus

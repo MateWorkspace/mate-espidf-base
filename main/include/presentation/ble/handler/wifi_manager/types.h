@@ -14,10 +14,10 @@ extern "C" {
 
 typedef enum {
     PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_STOP           = 0,
-    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_START           = 1,
-    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_CONNECT_STORED  = 2,
-    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_DISCONNECT       = 3,
-    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_FORGET_STORED    = 4,
+    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_START          = 1,
+    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_CONNECT_STORED = 2,
+    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_DISCONNECT     = 3,
+    PRES_BLE_HANDLER_WIFI_MANAGER_COMMAND_FORGET_STORED  = 4,
 } pres_ble_handler_wifi_manager_command_t;
 
 typedef struct {
@@ -28,9 +28,9 @@ typedef struct {
 
 typedef struct pres_ble_handler_wifi_manager_t {
     pres_ble_handler_wifi_manager_cfg_t cfg;
-    bool                                  registered;
-    bool                                  status_cb_subscribed;
-    uint16_t                              status_chr_hdl;
+    bool                                registered;
+    bool                                status_cb_subscribed;
+    uint16_t                            status_chr_hdl;
 } pres_ble_handler_wifi_manager_t;
 
 #ifdef __cplusplus

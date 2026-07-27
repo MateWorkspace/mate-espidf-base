@@ -11,7 +11,7 @@
 struct pres_ble_gatt_registry_t {
     const struct ble_gatt_svc_def* services[PRES_BLE_GATT_REGISTRY_MAX_SERVICES];
     unsigned int                   count;
-    bool                            registered;
+    bool                           registered;
 };
 
 /* ble_gatts_add_svcs() retains a pointer to this array for the lifetime of

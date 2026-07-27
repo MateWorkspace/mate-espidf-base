@@ -22,10 +22,10 @@ extern "C" {
    info/debug(...) when BLE log forwarding is gated in (see handler.c's
    on_log_message). */
 #define PRES_BLE_HANDLER_LOG_MESSAGE_MAX_LEN 180
-#define PRES_BLE_HANDLER_LOG_QUEUE_LEN        16
+#define PRES_BLE_HANDLER_LOG_QUEUE_LEN       16
 #define PRES_BLE_HANDLER_LOG_TASK_STACK_SIZE 3072
-#define PRES_BLE_HANDLER_LOG_TASK_PRIORITY    3
-#define PRES_BLE_HANDLER_LOG_TASK_NAME        "ble_log"
+#define PRES_BLE_HANDLER_LOG_TASK_PRIORITY   3
+#define PRES_BLE_HANDLER_LOG_TASK_NAME       "ble_log"
 
 typedef struct {
     char   message[PRES_BLE_HANDLER_LOG_MESSAGE_MAX_LEN];
@@ -40,9 +40,9 @@ typedef struct {
 
 typedef struct pres_ble_handler_log_t {
     pres_ble_handler_log_cfg_t cfg;
-    bool                        registered;
-    bool                        logger_cb_subscribed;
-    bool                        gap_cb_subscribed;
+    bool                       registered;
+    bool                       logger_cb_subscribed;
+    bool                       gap_cb_subscribed;
 
     /* Read by on_log_message() on whatever task is logging - must stay
        cheap (plain volatile reads only, no locking) since that task is

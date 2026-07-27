@@ -6,8 +6,8 @@
 
 size_t pres_ble_handler_settings_dto_encode_snapshot(
     const dom_usecases_internal_settings_snapshot_t* snapshot,
-    char*                                             buf,
-    size_t                                             buf_cap
+    char*                                            buf,
+    size_t                                           buf_cap
 ) {
     if (!snapshot || !buf || buf_cap == 0) {
         return 0;
@@ -75,12 +75,12 @@ static void copy_field_if_present(cJSON* root, const char* key, char* dst, size_
 
     strncpy(dst, item->valuestring, dst_cap - 1);
     dst[dst_cap - 1] = '\0';
-    *set_flag         = true;
+    *set_flag        = true;
 }
 
 dom_models_error_t pres_ble_handler_settings_dto_decode_update(
-    const char*                                          json,
-    size_t                                                json_len,
+    const char*                                        json,
+    size_t                                             json_len,
     dom_usecases_internal_settings_preloaded_update_t* out
 ) {
     if (!json || !out) {
