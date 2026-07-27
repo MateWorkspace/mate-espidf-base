@@ -22,9 +22,9 @@ void pres_mqtt_handler_ota(pres_mqtt_context_t* ctx, const char* data, int data_
         return;
     }
 
-    cJSON* url_item      = cJSON_GetObjectItemCaseSensitive(json, "url");
-    cJSON* size_item     = cJSON_GetObjectItemCaseSensitive(json, "size");
-    cJSON* checksum_item = cJSON_GetObjectItemCaseSensitive(json, "checksum");
+    cJSON* url_item      = cJSON_GetObjectItemCaseSensitive(json, "firmware_url");
+    cJSON* size_item     = cJSON_GetObjectItemCaseSensitive(json, "firmware_size");
+    cJSON* checksum_item = cJSON_GetObjectItemCaseSensitive(json, "firmware_checksum");
 
     if (!cJSON_IsString(url_item) || !cJSON_IsNumber(size_item) || !cJSON_IsString(checksum_item)) {
         ctx->logger->error(ctx->logger, TAG, "Invalid OTA payload fields");

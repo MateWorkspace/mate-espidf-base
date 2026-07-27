@@ -67,9 +67,30 @@ char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
 }
 
 char* inf_messaging_def_pub_mqtt_impl_build_status_json(
-    const char* status
+    dom_models_device_status_t status
 ) {
-    if (!cstr_available(status)) {
+    cJSON* root = cJSON_CreateObject();
+    if (!root) {
+        return NULL;
+    }
+
+    if (!cJSON_AddStringToObject(root, "status", dom_models_device_status_str(status))) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    char* json = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    return json;
+}
+
+char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
+    const char* execution_id,
+    const char* status,
+    const char* message
+) {
+    if (!cstr_available(execution_id) || !cstr_available(status)) {
         return NULL;
     }
 
@@ -78,7 +99,13 @@ char* inf_messaging_def_pub_mqtt_impl_build_status_json(
         return NULL;
     }
 
-    if (!cJSON_AddStringToObject(root, "status", status)) {
+    if (!cJSON_AddStringToObject(root, "execution_id", execution_id) ||
+        !cJSON_AddStringToObject(root, "status", status)) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    if (cstr_available(message) && !cJSON_AddStringToObject(root, "message", message)) {
         cJSON_Delete(root);
         return NULL;
     }

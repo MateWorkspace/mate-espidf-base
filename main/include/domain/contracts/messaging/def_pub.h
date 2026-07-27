@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "domain/models/device_status.h"
 #include "domain/models/error.h"
 
 #ifdef __cplusplus
@@ -28,13 +29,20 @@ struct dom_contracts_messaging_def_pub_t {
     dom_models_error_t (*status)(
         dom_contracts_messaging_def_pub_t* self,
         const char*                        device_id,
-        const char*                        status
+        dom_models_device_status_t         status
     );
     dom_models_error_t (*log)(
         dom_contracts_messaging_def_pub_t* self,
         const char*                        device_id,
         const char*                        msg,
         size_t                             msg_len
+    );
+    dom_models_error_t (*action_ack)(
+        dom_contracts_messaging_def_pub_t* self,
+        const char*                        device_id,
+        const char*                        execution_id,
+        const char*                        status,
+        const char*                        message
     );
 };
 

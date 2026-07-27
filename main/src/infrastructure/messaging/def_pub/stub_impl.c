@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "domain/contracts/messaging/def_pub.h"
+#include "domain/models/device_status.h"
 #include "domain/models/error.h"
 #include "infrastructure/messaging/def_pub/stub_impl_utils.h"
 
@@ -21,13 +22,20 @@ static dom_models_error_t registration_impl(
 static dom_models_error_t status_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
-    const char*                        status
+    dom_models_device_status_t         status
 );
 static dom_models_error_t log_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
     const char*                        msg,
     size_t                             msg_len
+);
+static dom_models_error_t action_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
 );
 
 /* Constructor and Destructor */
@@ -57,6 +65,7 @@ dom_contracts_messaging_def_pub_t* inf_messaging_def_pub_stub_impl_new(
     self->registration = registration_impl;
     self->status       = status_impl;
     self->log          = log_impl;
+    self->action_ack   = action_ack_impl;
 
     return self;
 }
@@ -102,7 +111,7 @@ static dom_models_error_t registration_impl(
 static dom_models_error_t status_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
-    const char*                        status
+    dom_models_device_status_t         status
 ) {
     if (!self || !self->ctx) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
@@ -122,4 +131,18 @@ static dom_models_error_t log_impl(
     }
 
     return inf_messaging_def_pub_stub_impl_set_log(self->ctx, device_id, msg, msg_len);
+}
+
+static dom_models_error_t action_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return inf_messaging_def_pub_stub_impl_set_action_ack(self->ctx, device_id, execution_id, status, message);
 }

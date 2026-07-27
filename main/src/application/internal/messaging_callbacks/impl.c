@@ -5,13 +5,12 @@
 
 #include "application/internal/messaging_callbacks/impl_types.h"
 #include "application/internal/messaging_callbacks/impl_utils.h"
+#include "domain/models/device_status.h"
 #include "domain/models/error.h"
 #include "domain/models/system.h"
 #include "domain/usecases/internal/messaging_callbacks.h"
 
 #define BASE_TAG "internal_messaging_callbacks"
-
-#define STATUS_ONLINE "ONLINE"
 
 /* Helper Function Prototypes */
 
@@ -46,6 +45,12 @@ static dom_models_error_t subscribe_defaults_impl(
 static dom_models_error_t restart_impl(
     dom_usecases_internal_messaging_callbacks_t* self,
     uint32_t                                     delay_ms
+);
+static dom_models_error_t publish_action_ack_impl(
+    dom_usecases_internal_messaging_callbacks_t* self,
+    const char*                                  execution_id,
+    const char*                                  status,
+    const char*                                  message
 );
 
 /* Constructor and Destructor */
@@ -84,6 +89,7 @@ dom_usecases_internal_messaging_callbacks_t* app_internal_messaging_callbacks_im
     self->publish_online_status = publish_online_status_impl;
     self->subscribe_defaults    = subscribe_defaults_impl;
     self->restart               = restart_impl;
+    self->publish_action_ack    = publish_action_ack_impl;
 
     ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
 
@@ -186,7 +192,7 @@ static dom_models_error_t publish_online_status_impl(
         return err;
     }
 
-    err = ctx->cfg.def_pub->status(ctx->cfg.def_pub, device_id_str, STATUS_ONLINE);
+    err = ctx->cfg.def_pub->status(ctx->cfg.def_pub, device_id_str, DOM_MODELS_DEVICE_STATUS_ONLINE);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to publish online status: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
@@ -257,6 +263,38 @@ static dom_models_error_t restart_impl(
     }
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "System restart requested successfully");
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+static dom_models_error_t publish_action_ack_impl(
+    dom_usecases_internal_messaging_callbacks_t* self,
+    const char*                                  execution_id,
+    const char*                                  status,
+    const char*                                  message
+) {
+    const char* tag = BASE_TAG "/publish_action_ack";
+
+    app_internal_messaging_callbacks_impl_ctx_t* ctx = NULL;
+    dom_models_error_t                           err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    char device_id_str[37];
+    err = load_device_id_str(ctx, device_id_str, sizeof(device_id_str));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load device id: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    err = ctx->cfg.def_pub->action_ack(ctx->cfg.def_pub, device_id_str, execution_id, status, message);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to publish action ack: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "Action ack published successfully");
 
     return DOMAIN_MODELS_ERROR_OK;
 }

@@ -27,6 +27,12 @@ struct dom_usecases_internal_messaging_callbacks_t {
         dom_usecases_internal_messaging_callbacks_t* self,
         uint32_t                                     delay_ms
     );
+    dom_models_error_t (*publish_action_ack)(
+        dom_usecases_internal_messaging_callbacks_t* self,
+        const char*                                  execution_id,
+        const char*                                  status,
+        const char*                                  message
+    );
 };
 
 static inline dom_usecases_internal_messaging_callbacks_t* dom_usecases_internal_messaging_callbacks_new(void* ctx) {

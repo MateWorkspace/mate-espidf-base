@@ -48,14 +48,14 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_registration(
 dom_models_error_t inf_messaging_def_pub_stub_impl_set_status(
     inf_messaging_def_pub_stub_impl_ctx_t* ctx,
     const char*                            device_id,
-    const char*                            status
+    dom_models_device_status_t             status
 ) {
-    if (!ctx || !cstr_available(device_id) || !cstr_available(status)) {
+    if (!ctx || !cstr_available(device_id)) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
     copy_cstr(ctx->last_status_device_id, sizeof(ctx->last_status_device_id), device_id);
-    copy_cstr(ctx->last_status, sizeof(ctx->last_status), status);
+    ctx->last_status = status;
     ctx->status_publish_cnt++;
 
     return DOMAIN_MODELS_ERROR_OK;
@@ -77,6 +77,26 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_log(
     memcpy(ctx->last_log_message, msg, copy_len);
     ctx->last_log_message[copy_len] = '\0';
     ctx->log_publish_cnt++;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+dom_models_error_t inf_messaging_def_pub_stub_impl_set_action_ack(
+    inf_messaging_def_pub_stub_impl_ctx_t* ctx,
+    const char*                            device_id,
+    const char*                            execution_id,
+    const char*                            status,
+    const char*                            message
+) {
+    if (!ctx || !cstr_available(device_id) || !cstr_available(execution_id) || !cstr_available(status)) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    copy_cstr(ctx->last_action_ack_device_id, sizeof(ctx->last_action_ack_device_id), device_id);
+    copy_cstr(ctx->last_action_ack_execution_id, sizeof(ctx->last_action_ack_execution_id), execution_id);
+    copy_cstr(ctx->last_action_ack_status, sizeof(ctx->last_action_ack_status), status);
+    copy_cstr(ctx->last_action_ack_message, sizeof(ctx->last_action_ack_message), message);
+    ctx->action_ack_publish_cnt++;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

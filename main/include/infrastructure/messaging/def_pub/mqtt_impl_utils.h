@@ -1,8 +1,10 @@
 #ifndef INFRASTRUCTURE_MESSAGING_DEF_PUB_MQTT_IMPL_UTILS_H
 #define INFRASTRUCTURE_MESSAGING_DEF_PUB_MQTT_IMPL_UTILS_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
+#include "domain/models/device_status.h"
 #include "domain/models/error.h"
 #include "infrastructure/messaging/def_pub/mqtt_impl_types.h"
 
@@ -30,7 +32,13 @@ char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_status_json(
-    const char* status
+    dom_models_device_status_t status
+);
+
+char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
+    const char* execution_id,
+    const char* status,
+    const char* message
 );
 
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
