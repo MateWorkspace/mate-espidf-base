@@ -35,6 +35,11 @@ extern const ble_uuid128_t pres_ble_gatt_uuid_log_service;
 extern const ble_uuid128_t pres_ble_gatt_uuid_log_message_chr;
 extern const ble_uuid128_t pres_ble_gatt_uuid_log_enabled_chr;
 
+/* System info service (0x0004) */
+extern const ble_uuid128_t pres_ble_gatt_uuid_system_info_service;
+extern const ble_uuid128_t pres_ble_gatt_uuid_system_info_info_chr;
+extern const ble_uuid128_t pres_ble_gatt_uuid_system_info_config_schema_chr;
+
 #ifdef __cplusplus
 }
 #endif
