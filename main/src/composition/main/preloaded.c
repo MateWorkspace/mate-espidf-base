@@ -27,6 +27,12 @@
 
 dom_models_preloaded_t dom_models_preloaded_data;
 
+#define X(cb_name, cb_key, cb_type) {cb_key, cb_type},
+const dom_models_preloaded_schema_entry_t dom_models_preloaded_schema[DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT] = {
+    DOMAIN_MODELS_PRELOADED_SCHEMA(X)
+};
+#undef X
+
 /* Helper Function Prototypes */
 
 static dom_models_error_t load_default(void);
