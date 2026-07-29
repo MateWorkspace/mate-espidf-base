@@ -12,7 +12,7 @@
 #include "presentation/ble/host_utils.h"
 #include "services/gap/ble_svc_gap.h"
 
-#define TAG_PATH "ble/host"
+#define BASE_TAG "ble/host"
 
 /* NimBLE's ble_hs_cfg.reset_cb/sync_cb and the ble_gap_adv_start() event
    callback are plain function pointers with no (or a NimBLE-owned) context
@@ -104,7 +104,7 @@ void pres_ble_host_remove_gap_event_callback(
 }
 
 dom_models_error_t pres_ble_host_start(pres_ble_host_t* self) {
-    const char* tag = TAG_PATH "/start";
+    const char* tag = BASE_TAG "/start";
 
     if (!self) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
@@ -137,7 +137,7 @@ void pres_ble_host_stop(pres_ble_host_t* self) {
         return;
     }
 
-    const char* tag = TAG_PATH "/stop";
+    const char* tag = BASE_TAG "/stop";
 
     if (ble_gap_adv_active()) {
         int rc = ble_gap_adv_stop();
@@ -158,7 +158,7 @@ void pres_ble_host_stop(pres_ble_host_t* self) {
 }
 
 static int start_advertising(void) {
-    const char* tag = TAG_PATH "/start_advertising";
+    const char* tag = BASE_TAG "/start_advertising";
 
     if (!active_host || ble_gap_adv_active()) {
         return 0;
@@ -202,7 +202,7 @@ static int start_advertising(void) {
 }
 
 static int gap_event(struct ble_gap_event* event, void* arg) {
-    const char* tag = TAG_PATH "/gap_event";
+    const char* tag = BASE_TAG "/gap_event";
 
     (void)arg;
 
@@ -243,7 +243,7 @@ static int gap_event(struct ble_gap_event* event, void* arg) {
 }
 
 static void on_reset(int reason) {
-    const char* tag = TAG_PATH "/on_reset";
+    const char* tag = BASE_TAG "/on_reset";
 
     if (active_host) {
         active_host->cfg.logger->error(active_host->cfg.logger, tag, "NimBLE reset: %d", reason);
@@ -251,7 +251,7 @@ static void on_reset(int reason) {
 }
 
 static void on_sync(void) {
-    const char* tag = TAG_PATH "/on_sync";
+    const char* tag = BASE_TAG "/on_sync";
 
     if (!active_host) {
         return;
