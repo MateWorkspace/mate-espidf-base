@@ -31,6 +31,6 @@ const ble_uuid128_t pres_ble_gatt_uuid_log_message_chr = PRES_BLE_GATT_UUID128(0
 const ble_uuid128_t pres_ble_gatt_uuid_log_enabled_chr = PRES_BLE_GATT_UUID128(0x00, 0x03, 0x00, 0x02);
 
 /* System info service (0x0004) */
-const ble_uuid128_t pres_ble_gatt_uuid_system_info_service            = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x00);
-const ble_uuid128_t pres_ble_gatt_uuid_system_info_info_chr           = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x01);
-const ble_uuid128_t pres_ble_gatt_uuid_system_info_config_schema_chr  = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x02);
+const ble_uuid128_t pres_ble_gatt_uuid_system_info_service           = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x00);
+const ble_uuid128_t pres_ble_gatt_uuid_system_info_info_chr          = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x01);
+const ble_uuid128_t pres_ble_gatt_uuid_system_info_config_schema_chr = PRES_BLE_GATT_UUID128(0x00, 0x04, 0x00, 0x02);

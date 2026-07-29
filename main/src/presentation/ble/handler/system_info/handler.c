@@ -157,9 +157,9 @@ static int config_schema_access_callback(
         return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
     }
 
-    const dom_models_preloaded_schema_entry_t* entries    = NULL;
-    size_t                                      entry_count = 0;
-    dom_models_error_t                          err         = self->cfg.system_info->get_preloaded_schema(self->cfg.system_info, &entries, &entry_count);
+    const dom_models_preloaded_schema_entry_t* entries     = NULL;
+    size_t                                     entry_count = 0;
+    dom_models_error_t                         err         = self->cfg.system_info->get_preloaded_schema(self->cfg.system_info, &entries, &entry_count);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return BLE_ATT_ERR_UNLIKELY;
     }

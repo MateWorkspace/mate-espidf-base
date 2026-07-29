@@ -6,8 +6,8 @@
 #include "domain/contracts/messaging/def_pub.h"
 #include "domain/contracts/messaging/def_sub.h"
 #include "domain/contracts/repository/preloaded.h"
-#include "domain/usecases/internal/system_info.h"
 #include "domain/contracts/system/restart.h"
+#include "domain/usecases/internal/system_info.h"
 
 /* Helper Function Prototypes */
 

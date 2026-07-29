@@ -58,8 +58,8 @@ dom_usecases_internal_system_info_t* app_internal_system_info_impl_new(const app
         return NULL;
     }
 
-    self->get_project_info    = get_project_info_impl;
-    self->get_chip_info       = get_chip_info_impl;
+    self->get_project_info     = get_project_info_impl;
+    self->get_chip_info        = get_chip_info_impl;
     self->get_preloaded_schema = get_preloaded_schema_impl;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "System Info created successfully");

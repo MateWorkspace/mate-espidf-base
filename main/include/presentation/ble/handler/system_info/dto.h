@@ -13,15 +13,15 @@ extern "C" {
 size_t pres_ble_handler_system_info_dto_encode_info(
     const dom_models_system_project_info_t* project,
     const dom_models_system_chip_info_t*    chip,
-    char*                                    buf,
-    size_t                                   buf_cap
+    char*                                   buf,
+    size_t                                  buf_cap
 );
 
 size_t pres_ble_handler_system_info_dto_encode_config_schema(
     const dom_models_preloaded_schema_entry_t* entries,
-    size_t                                      count,
-    char*                                       buf,
-    size_t                                      buf_cap
+    size_t                                     count,
+    char*                                      buf,
+    size_t                                     buf_cap
 );
 
 #ifdef __cplusplus

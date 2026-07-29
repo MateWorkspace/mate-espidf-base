@@ -9,8 +9,8 @@ static const char* value_type_str(dom_models_preloaded_value_type_t type);
 size_t pres_ble_handler_system_info_dto_encode_info(
     const dom_models_system_project_info_t* project,
     const dom_models_system_chip_info_t*    chip,
-    char*                                    buf,
-    size_t                                   buf_cap
+    char*                                   buf,
+    size_t                                  buf_cap
 ) {
     if (!project || !chip || !buf || buf_cap == 0) {
         return 0;
@@ -46,9 +46,9 @@ size_t pres_ble_handler_system_info_dto_encode_info(
 
 size_t pres_ble_handler_system_info_dto_encode_config_schema(
     const dom_models_preloaded_schema_entry_t* entries,
-    size_t                                      count,
-    char*                                       buf,
-    size_t                                       buf_cap
+    size_t                                     count,
+    char*                                      buf,
+    size_t                                     buf_cap
 ) {
     if (!entries || !buf || buf_cap == 0) {
         return 0;
