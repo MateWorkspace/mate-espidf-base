@@ -28,14 +28,9 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
-    esp_err_t esp_err = esp_mqtt_client_register_event(
-        launcher->driver.mqtt_client,
-        ESP_EVENT_ANY_ID,
-        pres_mqtt_event_handler,
-        launcher->presentation.mqtt_context
-    );
-    if (esp_err != ESP_OK) {
-        return DOMAIN_MODELS_ERROR_FAILURE;
+    dom_models_error_t err = pres_mqtt_context_init(launcher->presentation.mqtt_context, launcher->driver.mqtt_client);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
     }
 
     pres_task_wifi_sta_reconnect_cfg_t reconnect_task_cfg = {
@@ -46,7 +41,7 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
-    dom_models_error_t err = pres_task_wifi_sta_reconnect_start(launcher->presentation.wifi_sta_reconnect_task);
+    err = pres_task_wifi_sta_reconnect_start(launcher->presentation.wifi_sta_reconnect_task);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return err;
     }
@@ -160,15 +155,8 @@ void cmp_main_presentation_deinit(cmp_main_launcher_t* launcher) {
         launcher->presentation.wifi_sta_reconnect_task = NULL;
     }
 
-    if (launcher->driver.mqtt_client) {
-        esp_mqtt_client_unregister_event(
-            launcher->driver.mqtt_client,
-            ESP_EVENT_ANY_ID,
-            pres_mqtt_event_handler
-        );
-    }
-
     if (launcher->presentation.mqtt_context) {
+        pres_mqtt_context_deinit(launcher->presentation.mqtt_context, launcher->driver.mqtt_client);
         pres_mqtt_context_delete(launcher->presentation.mqtt_context);
         launcher->presentation.mqtt_context = NULL;
     }

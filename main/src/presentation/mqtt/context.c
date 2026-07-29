@@ -3,6 +3,9 @@
 #include <stdlib.h>
 
 #include "domain/models/error.h"
+#include "presentation/mqtt/event/event_handler.h"
+
+#define BASE_TAG "pres_mqtt_context"
 
 pres_mqtt_context_t* pres_mqtt_context_new(
     dom_contracts_logger_leveled_t*              logger,
@@ -34,6 +37,8 @@ pres_mqtt_context_t* pres_mqtt_context_new(
         return NULL;
     }
 
+    logger->info(logger, BASE_TAG "/new", "MQTT context created successfully");
+
     return self;
 }
 
@@ -43,4 +48,47 @@ void pres_mqtt_context_delete(pres_mqtt_context_t* self) {
     }
 
     free(self);
+}
+
+dom_models_error_t pres_mqtt_context_init(pres_mqtt_context_t* self, esp_mqtt_client_handle_t mqtt_client) {
+    const char* tag = BASE_TAG "/init";
+
+    if (!self || !mqtt_client) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    if (self->registered) {
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    esp_err_t esp_err = esp_mqtt_client_register_event(
+        mqtt_client,
+        ESP_EVENT_ANY_ID,
+        pres_mqtt_event_handler,
+        self
+    );
+    if (esp_err != ESP_OK) {
+        self->logger->error(self->logger, tag, "Failed to register MQTT event handler: %d", (int)esp_err);
+        return DOMAIN_MODELS_ERROR_FAILURE;
+    }
+
+    self->registered = true;
+
+    self->logger->info(self->logger, tag, "MQTT context initialized successfully");
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+void pres_mqtt_context_deinit(pres_mqtt_context_t* self, esp_mqtt_client_handle_t mqtt_client) {
+    if (!self || !mqtt_client || !self->registered) {
+        return;
+    }
+
+    esp_mqtt_client_unregister_event(
+        mqtt_client,
+        ESP_EVENT_ANY_ID,
+        pres_mqtt_event_handler
+    );
+
+    self->registered = false;
 }
