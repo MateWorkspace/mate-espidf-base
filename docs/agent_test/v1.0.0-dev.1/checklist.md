@@ -19,7 +19,14 @@ services) was tested separately as `scenario/10-ble-gatt-services.md` —
 see `09-known-gaps-summary.md` for the three real crash/discoverability
 bugs found and fixed there.
 
-Total test cases: 42 (+ 11 BLE cases in scenario 10, not counted here)
+**Dynamic config over MQTT was added after the original 42 cases too** — the
+`/sub/<device_id>/config` topic lets the backend push individual preloaded-schema
+key/value updates at runtime. Tested separately as
+`scenario/11-mqtt-config.md`; see `09-known-gaps-summary.md` for the boot-loop
+bug found and fixed there, plus three documented limitations.
+
+Total test cases: 42 (+ 11 BLE cases in scenario 10 and 5 config cases in
+scenario 11, not counted here)
 
 Before running anything, complete [`00-setup.md`](scenario/00-setup.md)
 (seed NVS, flash the real firmware, get a backend access token, upload a
@@ -106,6 +113,18 @@ reference.
 - [x] **BLE-09** — Log `enabled` read/write round-trips correctly (positive)
 - [x] **BLE-10** — WiFi manager `command` write (disconnect/connect_stored) triggers reconnect with zero crashes (positive; ⚠ known gap found and fixed — see 09, second stack-overflow crash)
 - [ ] **BLE-11** — Log message notifications delivered during a WiFi reconnect — **not confirmed**: 0 notifications observed, likely BLE/WiFi radio coexistence, not investigated further
+
+## 11 — MQTT Dynamic Config (`scenario/11-mqtt-config.md`)
+
+Added with the dynamic-configuration-over-MQTT feature; not part of the
+original 42 cases. See the scenario file for the topic/payload shape and the
+per-key type handling.
+
+- [x] **CFG-01** — `{"key":"mqtt_proto","value":"mqtts"}`: known string key persists via `set_preloaded` (positive)
+- [x] **CFG-02** — `{"key":"nonexistent_key","value":"x"}`: `Unknown config key`, dropped, no crash (negative)
+- [x] **CFG-03** — `{"key":"sys_rst_aft_ms","value":"not_a_number"}`: `Invalid config value`, dropped, no crash (negative)
+- [x] **CFG-04** — `{"key":"wifi_try_init","value":"true"}`: valid boolean still rejected as not-writable-via-MQTT (negative; ⚠ known gap — see 09, gap #2, wiring gap only, writable over BLE)
+- [x] **CFG-05** — `{"key":"sys_rst_aft_ms","value":"0"}`: rejected, not persisted, no restart (negative, boot-loop guard; ⚠ known gap found and fixed — see 09, bug #8)
 
 ## Reference
 
