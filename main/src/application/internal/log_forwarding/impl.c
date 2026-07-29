@@ -71,6 +71,8 @@ void app_internal_log_forwarding_impl_delete(dom_usecases_internal_log_forwardin
         return;
     }
 
+    app_internal_log_forwarding_impl_deinit(self);
+
     app_internal_log_forwarding_impl_ctx_t* ctx = self->ctx;
     if (ctx) {
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "Log forwarding deleted successfully");

@@ -3,14 +3,12 @@
 #include <string.h>
 
 #include "composition/main/utils.h"
-#include "mqtt_client.h"
 #include "presentation/ble/gatt/registry.h"
 #include "presentation/ble/handler/log/handler.h"
 #include "presentation/ble/handler/settings/handler.h"
 #include "presentation/ble/handler/wifi_manager/handler.h"
 #include "presentation/ble/host.h"
 #include "presentation/mqtt/context.h"
-#include "presentation/mqtt/event/event_handler.h"
 #include "presentation/task/wifi_sta_reconnect/task.h"
 
 dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
@@ -157,7 +155,7 @@ void cmp_main_presentation_deinit(cmp_main_launcher_t* launcher) {
     }
 
     if (launcher->presentation.mqtt_context) {
-        pres_mqtt_context_deinit(launcher->presentation.mqtt_context, launcher->driver.mqtt_client);
+        pres_mqtt_context_deinit(launcher->presentation.mqtt_context);
         pres_mqtt_context_delete(launcher->presentation.mqtt_context);
         launcher->presentation.mqtt_context = NULL;
     }

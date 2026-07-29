@@ -28,6 +28,7 @@ pres_mqtt_context_t* pres_mqtt_context_new(
     self->preloaded_repository = preloaded_repository;
     self->messaging_callbacks  = messaging_callbacks;
     self->ota                  = ota;
+    self->mqtt_client          = NULL;
 
     dom_models_error_t err = preloaded_repository->get_device_id_str(
         preloaded_repository,
@@ -49,6 +50,8 @@ void pres_mqtt_context_delete(pres_mqtt_context_t* self) {
         return;
     }
 
+    pres_mqtt_context_deinit(self);
+
     free(self);
 }
 
@@ -62,6 +65,8 @@ dom_models_error_t pres_mqtt_context_init(pres_mqtt_context_t* self, esp_mqtt_cl
     if (self->registered) {
         return DOMAIN_MODELS_ERROR_OK;
     }
+
+    self->mqtt_client = mqtt_client;
 
     int written = snprintf(self->registration_ack_topic, sizeof(self->registration_ack_topic), "/sub/%s/registration_ack", self->device_id_str);
     if (written <= 0 || (size_t)written >= sizeof(self->registration_ack_topic)) {
@@ -99,13 +104,13 @@ dom_models_error_t pres_mqtt_context_init(pres_mqtt_context_t* self, esp_mqtt_cl
     return DOMAIN_MODELS_ERROR_OK;
 }
 
-void pres_mqtt_context_deinit(pres_mqtt_context_t* self, esp_mqtt_client_handle_t mqtt_client) {
-    if (!self || !mqtt_client || !self->registered) {
+void pres_mqtt_context_deinit(pres_mqtt_context_t* self) {
+    if (!self || !self->mqtt_client || !self->registered) {
         return;
     }
 
     esp_mqtt_client_unregister_event(
-        mqtt_client,
+        self->mqtt_client,
         ESP_EVENT_ANY_ID,
         pres_mqtt_event_handler
     );

@@ -103,6 +103,8 @@ void app_internal_messaging_callbacks_impl_delete(dom_usecases_internal_messagin
         return;
     }
 
+    app_internal_messaging_callbacks_impl_deinit(self);
+
     app_internal_messaging_callbacks_impl_ctx_t* ctx = self->ctx;
     if (ctx) {
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks deleted successfully");

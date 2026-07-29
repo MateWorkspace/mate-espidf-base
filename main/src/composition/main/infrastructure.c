@@ -18,7 +18,9 @@ dom_models_error_t cmp_main_infrastructure_init(cmp_main_launcher_t* launcher) {
 
     inf_logger_leveled_stdio_impl_cfg_t logger_cfg = {
         .level      = DOMAIN_MODELS_LOGGER_LEVEL_INFO,
-        .cb_max_cnt = 2,  // Two direct subscribers: MQTT messaging_callbacks and BLE log handler
+        /* Exactly one direct subscriber: the log_forwarding usecase, which
+           fans out to its own sinks (MQTT, BLE) internally. */
+        .cb_max_cnt = 1,
     };
     launcher->infrastructure.logger = inf_logger_leveled_stdio_impl_new(&logger_cfg);
     if (!launcher->infrastructure.logger) {

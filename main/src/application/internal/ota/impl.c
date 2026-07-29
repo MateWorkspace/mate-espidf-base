@@ -86,6 +86,8 @@ void app_internal_ota_impl_delete(dom_usecases_internal_ota_t* self) {
         return;
     }
 
+    app_internal_ota_impl_deinit(self);
+
     app_internal_ota_impl_ctx_t* ctx = self->ctx;
     if (ctx) {
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "OTA deleted successfully");
