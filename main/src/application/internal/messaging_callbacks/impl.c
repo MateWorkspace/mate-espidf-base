@@ -278,6 +278,12 @@ static dom_models_error_t subscribe_defaults_impl(
         return err;
     }
 
+    err = ctx->cfg.def_sub->config(device_id_str, ctx->cfg.def_sub);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to config: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Default subscriptions completed successfully");
 
     return DOMAIN_MODELS_ERROR_OK;
