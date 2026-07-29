@@ -60,7 +60,7 @@ def parse_preloaded_schema(repo_root: Path) -> list[dict]:
         if type_suffix not in _TYPE_MAP:
             raise SystemExit(f"preloaded.h schema row has unrecognized value type suffix '{type_suffix}'")
 
-        schema.append({"key": key_defines[key_macro], "type": _TYPE_MAP[type_suffix]})
+        schema.append({"key": key_defines[key_macro], "value_type": _TYPE_MAP[type_suffix]})
 
     if not schema:
         raise SystemExit(
