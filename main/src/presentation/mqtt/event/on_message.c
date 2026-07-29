@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "presentation/mqtt/handler/action/handler.h"
-#include "presentation/mqtt/handler/ota.h"
+#include "presentation/mqtt/handler/ota/handler.h"
 #include "presentation/mqtt/handler/registration_ack.h"
 
 #define TAG "pres_mqtt_on_message"
