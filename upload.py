@@ -23,6 +23,7 @@ presigned download URL, ready to paste into an OTA dispatch request
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -32,6 +33,42 @@ import requests
 def load_config(path: Path) -> dict:
     with path.open() as f:
         return json.load(f)
+
+
+_SCHEMA_ROW_RE = re.compile(
+    r"X\(\s*\w+\s*,\s*(DOMAIN_MODELS_PRELOADED_\w+_KEY)\s*,\s*DOMAIN_MODELS_PRELOADED_VALUE_TYPE_(\w+)\s*\)"
+)
+_KEY_DEFINE_RE = re.compile(
+    r'#define\s+(DOMAIN_MODELS_PRELOADED_\w+_KEY)\s+"([^"]+)"'
+)
+_TYPE_MAP = {"STRING": "string", "UINT32": "uint32", "BOOL": "bool"}
+
+
+def parse_preloaded_schema(repo_root: Path) -> list[dict]:
+    header_path = repo_root / "main" / "include" / "domain" / "models" / "preloaded.h"
+    text = header_path.read_text()
+
+    key_defines = dict(_KEY_DEFINE_RE.findall(text))
+
+    schema = []
+    for key_macro, type_suffix in _SCHEMA_ROW_RE.findall(text):
+        if key_macro not in key_defines:
+            raise SystemExit(
+                f"preloaded.h schema row references undefined key macro '{key_macro}' - "
+                "check that DOMAIN_MODELS_PRELOADED_SCHEMA(X) and the _KEY defines are in sync"
+            )
+        if type_suffix not in _TYPE_MAP:
+            raise SystemExit(f"preloaded.h schema row has unrecognized value type suffix '{type_suffix}'")
+
+        schema.append({"key": key_defines[key_macro], "type": _TYPE_MAP[type_suffix]})
+
+    if not schema:
+        raise SystemExit(
+            "no config schema entries found in preloaded.h - "
+            "check DOMAIN_MODELS_PRELOADED_SCHEMA(X) is present and well-formed"
+        )
+
+    return schema
 
 
 def login(base_url: str, username: str, password: str) -> str:
@@ -73,12 +110,16 @@ def find_existing_firmware_id(base_url: str, token: str, firmware_name: str) -> 
     return resp.json()["id"]
 
 
-def create_firmware(base_url: str, token: str, node_class_id: str, name: str, file_path: Path) -> dict:
+def create_firmware(base_url: str, token: str, node_class_id: str, name: str, file_path: Path, config_schema: list[dict]) -> dict:
     with file_path.open("rb") as f:
         resp = requests.post(
             f"{base_url}/v1/firmwares",
             headers={"Authorization": f"Bearer {token}"},
-            data={"node_class_id": node_class_id, "name": name},
+            data={
+                "node_class_id": node_class_id,
+                "name": name,
+                "config_schema": json.dumps(config_schema),
+            },
             files={"file": (file_path.name, f, "application/octet-stream")},
             timeout=60,
         )
@@ -86,11 +127,12 @@ def create_firmware(base_url: str, token: str, node_class_id: str, name: str, fi
     return resp.json()
 
 
-def replace_firmware_binary(base_url: str, token: str, firmware_id: str, file_path: Path) -> dict:
+def replace_firmware_binary(base_url: str, token: str, firmware_id: str, file_path: Path, config_schema: list[dict]) -> dict:
     with file_path.open("rb") as f:
         resp = requests.put(
             f"{base_url}/v1/firmwares/{firmware_id}/binary",
             headers={"Authorization": f"Bearer {token}"},
+            data={"config_schema": json.dumps(config_schema)},
             files={"file": (file_path.name, f, "application/octet-stream")},
             timeout=60,
         )
@@ -119,6 +161,9 @@ def main() -> None:
     if not file_path.is_file():
         raise SystemExit(f"firmware binary not found at {file_path} - build it first (idf.py build)")
 
+    config_schema = parse_preloaded_schema(Path(__file__).parent)
+    print(f"Parsed {len(config_schema)} config parameter(s) from preloaded.h")
+
     print(f"Logging in to {base_url} as {config['username']}...")
     token = login(base_url, config["username"], config["password"])
 
@@ -130,11 +175,11 @@ def main() -> None:
 
     if existing_id:
         print(f"Firmware '{firmware_name}' already exists (id={existing_id}) - replacing its binary...")
-        result = replace_firmware_binary(base_url, token, existing_id, file_path)
+        result = replace_firmware_binary(base_url, token, existing_id, file_path, config_schema)
         firmware_id = existing_id
     else:
         print(f"Creating new firmware '{firmware_name}'...")
-        result = create_firmware(base_url, token, node_class_id, firmware_name, file_path)
+        result = create_firmware(base_url, token, node_class_id, firmware_name, file_path, config_schema)
         firmware_id = result["id"]
 
     print()
