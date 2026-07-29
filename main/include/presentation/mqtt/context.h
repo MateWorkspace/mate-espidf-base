@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+#define PRES_MQTT_CONTEXT_TOPIC_MAX_LEN 128
+
 typedef struct {
     dom_contracts_logger_leveled_t*              logger;
     dom_contracts_repository_preloaded_t*        preloaded_repository;
@@ -20,6 +22,18 @@ typedef struct {
     dom_usecases_internal_ota_t*                 ota;
     char                                         device_id_str[37];
     bool                                         registered;
+    /* Struct-owned (not stack-local in on_message.c's callback, which runs
+       on esp-mqtt's internal event task) - same rationale as
+       presentation/ble/handler/settings/types.h's comment: a stack-local
+       buffer in a callback on a task with limited stack already caused a
+       real crash this session (see docs/agent_test/v1.0.0-dev.1/scenario/09-known-gaps-summary.md,
+       bugs #6/#7); this fixes the one remaining presentation handler that
+       still had the same pattern before it had a chance to crash the
+       same way. */
+    char topic_scratch[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char registration_ack_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char ota_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char action_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
 } pres_mqtt_context_t;
 
 pres_mqtt_context_t* pres_mqtt_context_new(

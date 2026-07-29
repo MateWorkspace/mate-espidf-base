@@ -1,5 +1,6 @@
 #include "presentation/mqtt/context.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "domain/models/error.h"
@@ -59,6 +60,24 @@ dom_models_error_t pres_mqtt_context_init(pres_mqtt_context_t* self, esp_mqtt_cl
 
     if (self->registered) {
         return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    int written = snprintf(self->registration_ack_topic, sizeof(self->registration_ack_topic), "/sub/%s/registration_ack", self->device_id_str);
+    if (written <= 0 || (size_t)written >= sizeof(self->registration_ack_topic)) {
+        self->logger->error(self->logger, tag, "Failed to build registration_ack topic string");
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    written = snprintf(self->ota_topic, sizeof(self->ota_topic), "/sub/%s/ota", self->device_id_str);
+    if (written <= 0 || (size_t)written >= sizeof(self->ota_topic)) {
+        self->logger->error(self->logger, tag, "Failed to build ota topic string");
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    written = snprintf(self->action_topic, sizeof(self->action_topic), "/sub/%s/action", self->device_id_str);
+    if (written <= 0 || (size_t)written >= sizeof(self->action_topic)) {
+        self->logger->error(self->logger, tag, "Failed to build action topic string");
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
     esp_err_t esp_err = esp_mqtt_client_register_event(
