@@ -1,6 +1,8 @@
 #ifndef APPLICATION_INTERNAL_SYSTEM_INFO_IMPL_UTILS_H
 #define APPLICATION_INTERNAL_SYSTEM_INFO_IMPL_UTILS_H
 
+#include <stdbool.h>
+
 #include "application/internal/system_info/impl_types.h"
 #include "domain/models/error.h"
 

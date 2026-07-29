@@ -1,6 +1,8 @@
 #ifndef APPLICATION_INTERNAL_SYSTEM_INFO_IMPL_TYPES_H
 #define APPLICATION_INTERNAL_SYSTEM_INFO_IMPL_TYPES_H
 
+#include <stdbool.h>
+
 #include "domain/contracts/logger/leveled.h"
 #include "domain/contracts/system/info.h"
 
