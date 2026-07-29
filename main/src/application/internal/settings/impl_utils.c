@@ -3,13 +3,11 @@
 #include <string.h>
 
 #include "domain/contracts/repository/preloaded.h"
-#include "domain/contracts/system/info.h"
 #include "domain/contracts/system/restart.h"
 
 /* Helper Function Prototypes */
 
 static bool has_preloaded_repository_functions(dom_contracts_repository_preloaded_t* preloaded_repository);
-static bool has_system_info_functions(dom_contracts_system_info_t* system_info);
 static bool has_system_restart_functions(dom_contracts_system_restart_t* system_restart);
 
 dom_models_error_t app_internal_settings_impl_validate_cfg(const app_internal_settings_impl_cfg_t* cfg) {
@@ -18,7 +16,6 @@ dom_models_error_t app_internal_settings_impl_validate_cfg(const app_internal_se
         !cfg->logger->error ||
         !cfg->logger->info ||
         !has_preloaded_repository_functions(cfg->preloaded_repository) ||
-        !has_system_info_functions(cfg->system_info) ||
         !has_system_restart_functions(cfg->system_restart)) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
@@ -76,16 +73,6 @@ dom_models_error_t app_internal_settings_impl_load_snapshot(
         return err;
     }
 
-    err = ctx->cfg.system_info->get_project_info(ctx->cfg.system_info, &out->project);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        return err;
-    }
-
-    err = ctx->cfg.system_info->get_chip_info(ctx->cfg.system_info, &out->chip);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        return err;
-    }
-
     return DOMAIN_MODELS_ERROR_OK;
 }
 
@@ -117,12 +104,6 @@ static bool has_preloaded_repository_functions(dom_contracts_repository_preloade
            preloaded_repository->set_mqtt_pass &&
            preloaded_repository->get_system_restart_after_ms &&
            preloaded_repository->set_system_restart_after_ms;
-}
-
-static bool has_system_info_functions(dom_contracts_system_info_t* system_info) {
-    return system_info &&
-           system_info->get_project_info &&
-           system_info->get_chip_info;
 }
 
 static bool has_system_restart_functions(dom_contracts_system_restart_t* system_restart) {

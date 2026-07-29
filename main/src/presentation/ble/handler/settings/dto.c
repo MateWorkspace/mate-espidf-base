@@ -26,23 +26,6 @@ size_t pres_ble_handler_settings_dto_encode_snapshot(
     cJSON_AddBoolToObject(root, "mqtt_pass_set", snapshot->mqtt_pass[0] != '\0');
     cJSON_AddNumberToObject(root, "system_restart_after_ms", snapshot->system_restart_after_ms);
 
-    cJSON* project = cJSON_AddObjectToObject(root, "project");
-    if (project) {
-        cJSON_AddStringToObject(project, "project_name", snapshot->project.project_name);
-        cJSON_AddStringToObject(project, "project_version", snapshot->project.project_version);
-        cJSON_AddStringToObject(project, "name", snapshot->project.name);
-        cJSON_AddStringToObject(project, "type", snapshot->project.type);
-        cJSON_AddStringToObject(project, "firmware_version", snapshot->project.firmware_version);
-    }
-
-    cJSON* chip = cJSON_AddObjectToObject(root, "chip");
-    if (chip) {
-        cJSON_AddStringToObject(chip, "hardware_mac", snapshot->chip.hardware_mac);
-        cJSON_AddStringToObject(chip, "model", snapshot->chip.model);
-        cJSON_AddNumberToObject(chip, "revision", snapshot->chip.revision);
-        cJSON_AddNumberToObject(chip, "cores", snapshot->chip.cores);
-    }
-
     bool ok = cJSON_PrintPreallocated(root, buf, (int)buf_cap, false);
     cJSON_Delete(root);
 

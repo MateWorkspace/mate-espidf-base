@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include "domain/models/error.h"
-#include "domain/models/system.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,9 +47,6 @@ struct dom_usecases_internal_settings_snapshot_t {
     char mqtt_pass[128];
 
     uint32_t system_restart_after_ms;
-
-    dom_models_system_project_info_t project;
-    dom_models_system_chip_info_t    chip;
 };
 
 struct dom_usecases_internal_settings_preloaded_update_t {
