@@ -11,10 +11,7 @@
 #include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/wifi_manager/dto.h"
 
-#define BASE_TAG                       "ble/handler/wifi_manager"
-#define CONNECT_PAYLOAD_MAX_LEN        160
-#define STATUS_JSON_MAX_LEN            256
-#define STORED_CREDENTIAL_JSON_MAX_LEN 96
+#define BASE_TAG "ble/handler/wifi_manager"
 
 /* Global-lifetime GATT storage, same rationale as the settings handler
    (see its handler.c) - NimBLE retains raw pointers into these forever
@@ -181,13 +178,12 @@ static int status_access_callback(
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    char   json[STATUS_JSON_MAX_LEN];
-    size_t json_len = pres_ble_handler_wifi_manager_dto_encode_status(&status, json, sizeof(json));
+    size_t json_len = pres_ble_handler_wifi_manager_dto_encode_status(&status, self->status_json, sizeof(self->status_json));
     if (json_len == 0) {
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    return pres_ble_gatt_util_write_read_response(ctxt, json, json_len);
+    return pres_ble_gatt_util_write_read_response(ctxt, self->status_json, json_len);
 }
 
 static int connect_access_callback(
@@ -204,15 +200,14 @@ static int connect_access_callback(
         return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
     }
 
-    char   payload[CONNECT_PAYLOAD_MAX_LEN];
     size_t payload_len = 0;
-    int    rc          = pres_ble_gatt_util_read_write_payload(ctxt, payload, sizeof(payload), &payload_len);
+    int    rc          = pres_ble_gatt_util_read_write_payload(ctxt, self->connect_payload, sizeof(self->connect_payload), &payload_len);
     if (rc != 0) {
         return rc;
     }
 
     dom_models_wifi_sta_connect_config_t credential;
-    dom_models_error_t                   err = pres_ble_handler_wifi_manager_dto_decode_connect(payload, payload_len, &credential);
+    dom_models_error_t                   err = pres_ble_handler_wifi_manager_dto_decode_connect(self->connect_payload, payload_len, &credential);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return BLE_ATT_ERR_UNLIKELY;
     }
@@ -293,13 +288,12 @@ static int stored_credential_access_callback(
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    char   json[STORED_CREDENTIAL_JSON_MAX_LEN];
-    size_t json_len = pres_ble_handler_wifi_manager_dto_encode_stored_credential(&stored, json, sizeof(json));
+    size_t json_len = pres_ble_handler_wifi_manager_dto_encode_stored_credential(&stored, self->stored_credential_json, sizeof(self->stored_credential_json));
     if (json_len == 0) {
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    return pres_ble_gatt_util_write_read_response(ctxt, json, json_len);
+    return pres_ble_gatt_util_write_read_response(ctxt, self->stored_credential_json, json_len);
 }
 
 static int try_connect_on_init_access_callback(

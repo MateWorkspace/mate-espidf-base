@@ -10,14 +10,16 @@ deviates from the documented expectation (cross-reference
 `09-known-gaps-summary.md` for anything already flagged as a known gap so a
 deviation there isn't mistaken for a new bug).
 
-**BLE is explicitly out of scope for this pass** — it was already built and
-build-verified in a prior session, but cannot be exercised here since this
-dev machine has no Bluetooth adapter. Everything below tests the
-WiFi/MQTT/OTA path only, driven by NVS values written directly (via the
-`test_seed` composition — see `00-setup.md`) since BLE provisioning can't be
-used either.
+**BLE was out of scope for the original 42 cases below** — this dev machine
+had no Bluetooth adapter at the time, so WiFi/MQTT/OTA cases were driven by
+NVS values written directly (via the `test_seed` composition — see
+`00-setup.md`) instead of BLE provisioning. A Bluetooth adapter has since
+become available; the BLE GATT surface (settings, wifi_manager, log
+services) was tested separately as `scenario/10-ble-gatt-services.md` —
+see `09-known-gaps-summary.md` for the three real crash/discoverability
+bugs found and fixed there.
 
-Total test cases: 42
+Total test cases: 42 (+ 11 BLE cases in scenario 10, not counted here)
 
 Before running anything, complete [`00-setup.md`](scenario/00-setup.md)
 (seed NVS, flash the real firmware, get a backend access token, upload a
@@ -86,6 +88,24 @@ firmware binary).
 - [ ] **RESIL-02** — Per-device topic subscriptions survive an MQTT reconnect (positive) — **skipped**: depends on RESIL-01
 - [x] **RESIL-03** — Backend container restart mid-session: device reconnects and re-registers once backend is back (positive; ⚠ known gap found and fixed — see 09, `is_connected` staleness from a non-retained status publish)
 - [ ] **RESIL-04** — WiFi AP restart: device's `wifi_sta_reconnect` watchdog task reconnects without a manual power cycle (positive) — **skipped**: requires physically power-cycling the shared home AP
+
+## 10 — BLE GATT Services (`scenario/10-ble-gatt-services.md`)
+
+Added once a Bluetooth adapter became available; not part of the original
+42 cases. See the scenario file for full detail and the protocol
+reference.
+
+- [x] **BLE-01** — Device advertises and is discoverable by name (positive; ⚠ known gap found and fixed — see 09, advertising-payload overflow)
+- [x] **BLE-02** — GATT discovery matches the documented UUID/property table (positive)
+- [x] **BLE-03** — Settings `data` read returns a valid snapshot (positive; ⚠ known gap found and fixed — see 09, stack-overflow crash)
+- [x] **BLE-04** — Settings `update` write + `restart_required` reflects the change (positive)
+- [x] **BLE-05** — Settings `data` re-read shows the persisted change (positive)
+- [x] **BLE-06** — WiFi manager `status` read reflects live connection state (positive)
+- [x] **BLE-07** — WiFi manager `stored_credential` read reflects the seeded SSID (positive)
+- [x] **BLE-08** — WiFi manager `try_connect_on_init` read returns the seeded flag (positive)
+- [x] **BLE-09** — Log `enabled` read/write round-trips correctly (positive)
+- [x] **BLE-10** — WiFi manager `command` write (disconnect/connect_stored) triggers reconnect with zero crashes (positive; ⚠ known gap found and fixed — see 09, second stack-overflow crash)
+- [ ] **BLE-11** — Log message notifications delivered during a WiFi reconnect — **not confirmed**: 0 notifications observed, likely BLE/WiFi radio coexistence, not investigated further
 
 ## Reference
 

@@ -11,10 +11,7 @@
 #include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/settings/dto.h"
 
-#define BASE_TAG                      "ble/handler/settings"
-#define UPDATE_PAYLOAD_MAX_LEN        384
-#define SNAPSHOT_JSON_MAX_LEN         512
-#define RESTART_REQUIRED_JSON_MAX_LEN 48
+#define BASE_TAG "ble/handler/settings"
 
 /* Global-lifetime GATT storage - NimBLE retains raw pointers into these
    forever once ble_gatts_add_svcs() runs (see gatt/registry.h), so they
@@ -144,13 +141,12 @@ static int data_access_callback(
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    char   json[SNAPSHOT_JSON_MAX_LEN];
-    size_t json_len = pres_ble_handler_settings_dto_encode_snapshot(&snapshot, json, sizeof(json));
+    size_t json_len = pres_ble_handler_settings_dto_encode_snapshot(&snapshot, self->snapshot_json, sizeof(self->snapshot_json));
     if (json_len == 0) {
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    return pres_ble_gatt_util_write_read_response(ctxt, json, json_len);
+    return pres_ble_gatt_util_write_read_response(ctxt, self->snapshot_json, json_len);
 }
 
 static int update_access_callback(
@@ -167,15 +163,14 @@ static int update_access_callback(
         return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
     }
 
-    char   payload[UPDATE_PAYLOAD_MAX_LEN];
     size_t payload_len = 0;
-    int    rc          = pres_ble_gatt_util_read_write_payload(ctxt, payload, sizeof(payload), &payload_len);
+    int    rc          = pres_ble_gatt_util_read_write_payload(ctxt, self->update_payload, sizeof(self->update_payload), &payload_len);
     if (rc != 0) {
         return rc;
     }
 
     dom_usecases_internal_settings_preloaded_update_t update;
-    dom_models_error_t                                err = pres_ble_handler_settings_dto_decode_update(payload, payload_len, &update);
+    dom_models_error_t                                err = pres_ble_handler_settings_dto_decode_update(self->update_payload, payload_len, &update);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return BLE_ATT_ERR_UNLIKELY;
     }
@@ -213,13 +208,12 @@ static int restart_required_access_callback(
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    char   json[RESTART_REQUIRED_JSON_MAX_LEN];
-    size_t json_len = pres_ble_handler_settings_dto_encode_restart_required(restart_required, json, sizeof(json));
+    size_t json_len = pres_ble_handler_settings_dto_encode_restart_required(restart_required, self->restart_required_json, sizeof(self->restart_required_json));
     if (json_len == 0) {
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    return pres_ble_gatt_util_write_read_response(ctxt, json, json_len);
+    return pres_ble_gatt_util_write_read_response(ctxt, self->restart_required_json, json_len);
 }
 
 static int restart_access_callback(
