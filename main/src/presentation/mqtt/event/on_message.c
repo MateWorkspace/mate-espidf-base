@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "presentation/mqtt/handler/action/handler.h"
+#include "presentation/mqtt/handler/config/handler.h"
 #include "presentation/mqtt/handler/ota/handler.h"
 #include "presentation/mqtt/handler/registration_ack.h"
 
@@ -28,6 +29,8 @@ void pres_mqtt_event_on_message(pres_mqtt_context_t* ctx, esp_mqtt_event_handle_
         pres_mqtt_handler_ota(ctx, event->data, event->data_len);
     } else if (strcmp(ctx->topic_scratch, ctx->action_topic) == 0) {
         pres_mqtt_handler_action(ctx, event->data, event->data_len);
+    } else if (strcmp(ctx->topic_scratch, ctx->config_topic) == 0) {
+        pres_mqtt_handler_config(ctx, event->data, event->data_len);
     } else {
         ctx->logger->debug(ctx->logger, tag, "Unhandled topic: %s", ctx->topic_scratch);
     }
