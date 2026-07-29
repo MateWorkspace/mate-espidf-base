@@ -31,6 +31,7 @@ Every custom UUID follows `4d415445-SSSS-4700-CCCC-000000000000`
 | Settings | `0001` |
 | WiFi manager | `0002` |
 | Log | `0003` |
+| System info | `0004` |
 
 Settings (`0001`): `0001` data (R), `0002` update (W, JSON), `0003`
 restart_required (R/notify), `0004` restart (W, `uint32_t` delay_ms).
@@ -42,6 +43,10 @@ stored_credential (R), `0005` try_connect_on_init (R/W, `uint8_t` bool).
 
 Log (`0003`): `0001` message (R/notify), `0002` enabled (R/W, `uint8_t`
 bool).
+
+System info (`0004`): `0001` info (R, JSON `{project,chip}`), `0002`
+config_schema (R, JSON array of `{key,type}` for every preloaded config
+variable).
 
 Device advertises as `matedev_<device_id_str>` (e.g.
 `matedev_AC276E5E030C`) — only the name fits the legacy 31-byte
@@ -86,6 +91,10 @@ discovery), not from the advertisement itself.
   using the same now-fixed buffer pattern as the characteristics that
   were exercised, but weren't independently triggered to avoid
   disrupting the shared WiFi credential state mid-pass.
+- [x] **BLE-12** — System info `info` read returns project/chip data
+  matching the device's actual values; `config_schema` read lists all 7
+  preloaded config keys with correct types; Settings `data` no longer
+  includes `project`/`chip` (positive)
 
 ## Bugs found (see `09-known-gaps-summary.md` for full detail)
 

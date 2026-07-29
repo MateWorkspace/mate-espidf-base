@@ -4,6 +4,7 @@
 #include "application/internal/messaging_callbacks/impl.h"
 #include "application/internal/ota/impl.h"
 #include "application/internal/settings/impl.h"
+#include "application/internal/system_info/impl.h"
 #include "application/internal/wifi_manager/impl.h"
 
 dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
@@ -27,10 +28,18 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return err;
     }
 
+    app_internal_system_info_impl_cfg_t system_info_cfg = {
+        .logger      = launcher->infrastructure.logger,
+        .system_info = launcher->infrastructure.system_info,
+    };
+    launcher->application.system_info = app_internal_system_info_impl_new(&system_info_cfg);
+    if (!launcher->application.system_info) {
+        return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
+    }
+
     app_internal_settings_impl_cfg_t settings_cfg = {
         .logger               = launcher->infrastructure.logger,
         .preloaded_repository = launcher->infrastructure.preloaded_repository,
-        .system_info          = launcher->infrastructure.system_info,
         .system_restart       = launcher->infrastructure.system_restart,
     };
     launcher->application.settings = app_internal_settings_impl_new(&settings_cfg);
@@ -78,7 +87,7 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         .def_sub              = launcher->infrastructure.def_sub,
         .system_restart       = launcher->infrastructure.system_restart,
         .preloaded_repository = launcher->infrastructure.preloaded_repository,
-        .system_info          = launcher->infrastructure.system_info,
+        .system_info          = launcher->application.system_info,
         .log_forwarding       = launcher->application.log_forwarding,
     };
     launcher->application.messaging_callbacks = app_internal_messaging_callbacks_impl_new(&messaging_callbacks_cfg);
@@ -103,6 +112,11 @@ void cmp_main_application_deinit(cmp_main_launcher_t* launcher) {
         app_internal_messaging_callbacks_impl_deinit(launcher->application.messaging_callbacks);
         app_internal_messaging_callbacks_impl_delete(launcher->application.messaging_callbacks);
         launcher->application.messaging_callbacks = NULL;
+    }
+
+    if (launcher->application.system_info) {
+        app_internal_system_info_impl_delete(launcher->application.system_info);
+        launcher->application.system_info = NULL;
     }
 
     if (launcher->application.log_forwarding) {

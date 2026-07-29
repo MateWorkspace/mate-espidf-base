@@ -14,12 +14,14 @@
 #include "domain/usecases/internal/messaging_callbacks.h"
 #include "domain/usecases/internal/ota.h"
 #include "domain/usecases/internal/settings.h"
+#include "domain/usecases/internal/system_info.h"
 #include "domain/usecases/internal/wifi_manager.h"
 #include "mqtt_client.h"
 #include "nvs.h"
 #include "presentation/ble/gatt/registry.h"
 #include "presentation/ble/handler/log/handler.h"
 #include "presentation/ble/handler/settings/handler.h"
+#include "presentation/ble/handler/system_info/handler.h"
 #include "presentation/ble/handler/wifi_manager/handler.h"
 #include "presentation/ble/host.h"
 #include "presentation/mqtt/context.h"
@@ -49,6 +51,7 @@ typedef struct {
 typedef struct {
     dom_usecases_internal_ota_t*                 ota;
     dom_usecases_internal_settings_t*            settings;
+    dom_usecases_internal_system_info_t*         system_info;
     dom_usecases_internal_wifi_manager_t*        wifi_manager;
     dom_usecases_internal_log_forwarding_t*      log_forwarding;
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks;
@@ -61,6 +64,7 @@ typedef struct {
     pres_ble_handler_settings_t*     ble_settings;
     pres_ble_handler_wifi_manager_t* ble_wifi_manager;
     pres_ble_handler_log_t*          ble_log;
+    pres_ble_handler_system_info_t*  ble_system_info;
     pres_ble_host_t*                 ble_host;
 } cmp_main_launcher_presentation_t;
 

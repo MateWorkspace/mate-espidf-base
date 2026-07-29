@@ -6,6 +6,7 @@
 #include "presentation/ble/gatt/registry.h"
 #include "presentation/ble/handler/log/handler.h"
 #include "presentation/ble/handler/settings/handler.h"
+#include "presentation/ble/handler/system_info/handler.h"
 #include "presentation/ble/handler/wifi_manager/handler.h"
 #include "presentation/ble/host.h"
 #include "presentation/mqtt/context.h"
@@ -77,6 +78,20 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
         return err;
     }
 
+    pres_ble_handler_system_info_cfg_t ble_system_info_cfg = {
+        .logger        = launcher->infrastructure.logger,
+        .system_info   = launcher->application.system_info,
+        .gatt_registry = launcher->presentation.ble_gatt_registry,
+    };
+    launcher->presentation.ble_system_info = pres_ble_handler_system_info_new(&ble_system_info_cfg);
+    if (!launcher->presentation.ble_system_info) {
+        return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
+    }
+    err = pres_ble_handler_system_info_init(launcher->presentation.ble_system_info);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     char ble_device_name[40];
     err = cmp_main_utils_build_ble_device_name(ble_device_name, sizeof(ble_device_name));
     if (err != DOMAIN_MODELS_ERROR_OK) {
@@ -142,6 +157,11 @@ void cmp_main_presentation_deinit(cmp_main_launcher_t* launcher) {
     if (launcher->presentation.ble_settings) {
         pres_ble_handler_settings_delete(launcher->presentation.ble_settings);
         launcher->presentation.ble_settings = NULL;
+    }
+
+    if (launcher->presentation.ble_system_info) {
+        pres_ble_handler_system_info_delete(launcher->presentation.ble_system_info);
+        launcher->presentation.ble_system_info = NULL;
     }
 
     if (launcher->presentation.ble_gatt_registry) {
