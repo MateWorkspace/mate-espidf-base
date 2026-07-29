@@ -12,6 +12,10 @@ dom_usecases_internal_ota_t* app_internal_ota_impl_new(const app_internal_ota_im
 
 void app_internal_ota_impl_delete(dom_usecases_internal_ota_t* self);
 
+dom_models_error_t app_internal_ota_impl_init(dom_usecases_internal_ota_t* self);
+
+void app_internal_ota_impl_deinit(dom_usecases_internal_ota_t* self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -74,14 +74,6 @@ dom_usecases_internal_ota_t* app_internal_ota_impl_new(const app_internal_ota_im
     self->rollback   = rollback_impl;
     self->get_status = get_status_impl;
 
-    err = ctx->cfg.system_update->add_event_callback(ctx->cfg.system_update, ctx, on_update_event);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to register update event callback: %s (%d)", dom_models_error_str(err), (int)err);
-        dom_usecases_internal_ota_delete(self);
-        free(ctx);
-        return NULL;
-    }
-
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "OTA created successfully");
 
     return self;
@@ -96,12 +88,51 @@ void app_internal_ota_impl_delete(dom_usecases_internal_ota_t* self) {
 
     app_internal_ota_impl_ctx_t* ctx = self->ctx;
     if (ctx) {
-        (void)ctx->cfg.system_update->remove_event_callback(ctx->cfg.system_update, on_update_event);
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "OTA deleted successfully");
         free(ctx);
     }
 
     dom_usecases_internal_ota_delete(self);
+}
+
+dom_models_error_t app_internal_ota_impl_init(dom_usecases_internal_ota_t* self) {
+    const char* tag = BASE_TAG "/init";
+
+    app_internal_ota_impl_ctx_t* ctx = NULL;
+    dom_models_error_t           err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    if (ctx->event_subscribed) {
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    err = ctx->cfg.system_update->add_event_callback(ctx->cfg.system_update, ctx, on_update_event);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to register update event callback: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    ctx->event_subscribed = true;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "OTA initialized successfully");
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+void app_internal_ota_impl_deinit(dom_usecases_internal_ota_t* self) {
+    const char* tag = BASE_TAG "/deinit";
+
+    app_internal_ota_impl_ctx_t* ctx = NULL;
+    if (get_ctx(self, &ctx) != DOMAIN_MODELS_ERROR_OK || !ctx->event_subscribed) {
+        return;
+    }
+
+    (void)ctx->cfg.system_update->remove_event_callback(ctx->cfg.system_update, on_update_event);
+    ctx->event_subscribed = false;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "OTA deinitialized successfully");
 }
 
 /* Contract Function Implementations */

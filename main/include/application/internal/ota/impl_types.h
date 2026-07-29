@@ -27,6 +27,7 @@ typedef struct {
     bool                        updating;
     dom_models_error_t          last_result;
     int                         last_progress_percent;
+    bool                        event_subscribed;
 } app_internal_ota_impl_ctx_t;
 
 #ifdef __cplusplus

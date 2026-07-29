@@ -21,6 +21,11 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
+    dom_models_error_t err = app_internal_ota_impl_init(launcher->application.ota);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     app_internal_settings_impl_cfg_t settings_cfg = {
         .logger               = launcher->infrastructure.logger,
         .preloaded_repository = launcher->infrastructure.preloaded_repository,
@@ -43,7 +48,7 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
-    dom_models_error_t err = app_internal_wifi_manager_impl_init(launcher->application.wifi_manager);
+    err = app_internal_wifi_manager_impl_init(launcher->application.wifi_manager);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return err;
     }
@@ -92,6 +97,7 @@ void cmp_main_application_deinit(cmp_main_launcher_t* launcher) {
     }
 
     if (launcher->application.ota) {
+        app_internal_ota_impl_deinit(launcher->application.ota);
         app_internal_ota_impl_delete(launcher->application.ota);
         launcher->application.ota = NULL;
     }
