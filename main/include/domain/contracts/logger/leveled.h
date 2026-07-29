@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include "domain/models/error.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +39,7 @@ struct dom_contracts_logger_leveled_t {
         const char*                     format,
         ...
     );
-    void (*add_callback)(
+    dom_models_error_t (*add_callback)(
         dom_contracts_logger_leveled_t* self,
         void*                           cb_ctx,
         dom_contracts_logger_leveled_cb cb_func

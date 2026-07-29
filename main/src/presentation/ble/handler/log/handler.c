@@ -119,7 +119,11 @@ dom_models_error_t pres_ble_handler_log_init(pres_ble_handler_log_t* self) {
     }
     self->gap_cb_subscribed = true;
 
-    self->cfg.logger->add_callback(self->cfg.logger, self, on_log_message);
+    err = self->cfg.logger->add_callback(self->cfg.logger, self, on_log_message);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        self->cfg.logger->error(self->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
     self->logger_cb_subscribed = true;
 
     self->registered = true;

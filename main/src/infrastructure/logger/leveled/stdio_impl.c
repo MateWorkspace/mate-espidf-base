@@ -44,7 +44,7 @@ static void debug_impl(
     const char*                     format,
     ...
 );
-static void add_callback_impl(
+static dom_models_error_t add_callback_impl(
     dom_contracts_logger_leveled_t* self,
     void*                           cb_ctx,
     dom_contracts_logger_leveled_cb cb_func
@@ -185,28 +185,30 @@ static void debug_impl(
     va_end(args);
 }
 
-static void add_callback_impl(
+static dom_models_error_t add_callback_impl(
     dom_contracts_logger_leveled_t* self,
     void*                           cb_ctx,
     dom_contracts_logger_leveled_cb cb_func
 ) {
-    if (!self || !self->ctx) {
-        return;
+    if (!self || !self->ctx || !cb_func) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
     inf_logger_leveled_stdio_impl_ctx_t* ctx = self->ctx;
 
-    if (ctx->cb_idx >= ctx->cfg.cb_max_cnt) {
-        return;
+    if (!ctx->cb_funcs || !ctx->cb_ctxs) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
-    if (!ctx->cb_funcs || !ctx->cb_ctxs || !cb_func) {
-        return;
+    if (ctx->cb_idx >= ctx->cfg.cb_max_cnt) {
+        return DOMAIN_MODELS_ERROR_BAD_STATE;
     }
 
     ctx->cb_funcs[ctx->cb_idx] = cb_func;
     ctx->cb_ctxs[ctx->cb_idx]  = cb_ctx;
     ctx->cb_idx += 1;
+
+    return DOMAIN_MODELS_ERROR_OK;
 }
 
 static void remove_callback_impl(

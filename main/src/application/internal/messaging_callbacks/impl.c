@@ -91,7 +91,13 @@ dom_usecases_internal_messaging_callbacks_t* app_internal_messaging_callbacks_im
     self->restart               = restart_impl;
     self->publish_action_ack    = publish_action_ack_impl;
 
-    ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
+    err = ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
+        dom_usecases_internal_messaging_callbacks_delete(self);
+        free(ctx);
+        return NULL;
+    }
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks created successfully");
 
