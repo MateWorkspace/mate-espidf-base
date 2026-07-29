@@ -41,41 +41,84 @@ void pres_mqtt_handler_config(pres_mqtt_context_t* ctx, const char* data, int da
     dom_usecases_internal_settings_preloaded_update_t update;
     memset(&update, 0, sizeof(update));
 
-    if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PROTO_KEY) == 0) {
-        strncpy(update.mqtt_proto, request.value, sizeof(update.mqtt_proto) - 1);
-        update.mqtt_proto_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_HOST_KEY) == 0) {
-        strncpy(update.mqtt_host, request.value, sizeof(update.mqtt_host) - 1);
-        update.mqtt_host_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PORT_KEY) == 0) {
-        strncpy(update.mqtt_port, request.value, sizeof(update.mqtt_port) - 1);
-        update.mqtt_port_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_USER_KEY) == 0) {
-        strncpy(update.mqtt_user, request.value, sizeof(update.mqtt_user) - 1);
-        update.mqtt_user_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PASS_KEY) == 0) {
-        strncpy(update.mqtt_pass, request.value, sizeof(update.mqtt_pass) - 1);
-        update.mqtt_pass_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_SYSTEM_RESTART_AFTER_MS_KEY) == 0) {
-        char* endptr        = NULL;
-        unsigned long value = strtoul(request.value, &endptr, 10);
-        if (!endptr || *endptr != '\0') {
-            ctx->logger->warn(ctx->logger, tag, "Invalid config value for %s: %s", request.key, request.value);
-            return;
+    /* Type interpretation comes from the schema entry (the same source of truth
+       BLE's config_schema characteristic and upload.py consume); the key name
+       only selects which update field to populate. */
+    bool handled = false;
+
+    switch (matched_entry->type) {
+        case DOMAIN_MODELS_PRELOADED_VALUE_TYPE_STRING: {
+            if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PROTO_KEY) == 0) {
+                strncpy(update.mqtt_proto, request.value, sizeof(update.mqtt_proto) - 1);
+                update.mqtt_proto_set = true;
+                handled               = true;
+            } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_HOST_KEY) == 0) {
+                strncpy(update.mqtt_host, request.value, sizeof(update.mqtt_host) - 1);
+                update.mqtt_host_set = true;
+                handled              = true;
+            } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PORT_KEY) == 0) {
+                strncpy(update.mqtt_port, request.value, sizeof(update.mqtt_port) - 1);
+                update.mqtt_port_set = true;
+                handled              = true;
+            } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_USER_KEY) == 0) {
+                strncpy(update.mqtt_user, request.value, sizeof(update.mqtt_user) - 1);
+                update.mqtt_user_set = true;
+                handled              = true;
+            } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_MQTT_PASS_KEY) == 0) {
+                strncpy(update.mqtt_pass, request.value, sizeof(update.mqtt_pass) - 1);
+                update.mqtt_pass_set = true;
+                handled              = true;
+            }
+            break;
         }
-        update.system_restart_after_ms     = (uint32_t)value;
-        update.system_restart_after_ms_set = true;
-    } else if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_WIFI_STA_TRY_CONNECT_ON_INIT_KEY) == 0) {
-        if (strcmp(request.value, "true") != 0 && strcmp(request.value, "false") != 0) {
-            ctx->logger->warn(ctx->logger, tag, "Invalid config value for %s: %s", request.key, request.value);
-            return;
+
+        case DOMAIN_MODELS_PRELOADED_VALUE_TYPE_UINT32: {
+            char*         endptr = NULL;
+            unsigned long value  = strtoul(request.value, &endptr, 10);
+            /* strtoul("") leaves endptr at the terminating null, so the empty
+               string has to be rejected explicitly. */
+            if (request.value[0] == '\0' || !endptr || *endptr != '\0') {
+                ctx->logger->warn(ctx->logger, tag, "Invalid config value for %s: %s", request.key, request.value);
+                return;
+            }
+
+            if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_SYSTEM_RESTART_AFTER_MS_KEY) == 0) {
+                /* 0 would make the boot-time restart fire with no delay on every
+                   boot, an unrecoverable boot loop. Reject it here. */
+                if (value == 0) {
+                    ctx->logger->warn(ctx->logger, tag, "Invalid config value for %s: %s", request.key, request.value);
+                    return;
+                }
+                update.system_restart_after_ms     = (uint32_t)value;
+                update.system_restart_after_ms_set = true;
+                handled                            = true;
+            }
+            break;
         }
-        /* dom_usecases_internal_settings_preloaded_update_t has no
-           wifi_sta_try_connect_on_init field today (the settings usecase
-           only updates the mqtt_ fields and system_restart_after_ms) - this key exists
-           in the schema for BLE/read visibility but is not yet a settings
-           usecase update path. Log and skip rather than silently no-op. */
-        ctx->logger->warn(ctx->logger, tag, "Config key %s is read-only via MQTT (not yet supported by the settings usecase)", request.key);
+
+        case DOMAIN_MODELS_PRELOADED_VALUE_TYPE_BOOL: {
+            if (strcmp(request.value, "true") != 0 && strcmp(request.value, "false") != 0) {
+                ctx->logger->warn(ctx->logger, tag, "Invalid config value for %s: %s", request.key, request.value);
+                return;
+            }
+
+            if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_WIFI_STA_TRY_CONNECT_ON_INIT_KEY) == 0) {
+                /* The underlying setting IS writable - dom_usecases_internal_wifi_manager_t
+                   .set_try_connect_on_init exists and BLE's wifi_manager handler already
+                   calls it. The gap is wiring only: pres_mqtt_context_t holds no
+                   wifi_manager reference, so this handler cannot reach it, and
+                   dom_usecases_internal_settings_preloaded_update_t (the only path it
+                   does have) carries no wifi_sta_try_connect_on_init field.
+                   Log and skip rather than silently no-op. */
+                ctx->logger->warn(ctx->logger, tag, "Config key %s is not writable via MQTT (MQTT context has no wifi_manager reference; use BLE)", request.key);
+                return;
+            }
+            break;
+        }
+    }
+
+    if (!handled) {
+        ctx->logger->error(ctx->logger, tag, "Config key %s has no MQTT handler mapping despite being in the schema", request.key);
         return;
     }
 
