@@ -9,18 +9,20 @@
 #include "domain/contracts/repository/preloaded.h"
 #include "domain/contracts/system/info.h"
 #include "domain/contracts/system/restart.h"
+#include "domain/usecases/internal/log_forwarding.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-    dom_contracts_logger_leveled_t*       logger;
-    dom_contracts_messaging_def_pub_t*    def_pub;
-    dom_contracts_messaging_def_sub_t*    def_sub;
-    dom_contracts_system_restart_t*       system_restart;
-    dom_contracts_repository_preloaded_t* preloaded_repository;
-    dom_contracts_system_info_t*          system_info;
+    dom_contracts_logger_leveled_t*         logger;
+    dom_contracts_messaging_def_pub_t*      def_pub;
+    dom_contracts_messaging_def_sub_t*      def_sub;
+    dom_contracts_system_restart_t*         system_restart;
+    dom_contracts_repository_preloaded_t*   preloaded_repository;
+    dom_contracts_system_info_t*            system_info;
+    dom_usecases_internal_log_forwarding_t* log_forwarding;
 } app_internal_messaging_callbacks_impl_cfg_t;
 
 typedef struct {

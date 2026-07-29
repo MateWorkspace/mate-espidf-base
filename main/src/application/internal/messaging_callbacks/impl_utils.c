@@ -22,13 +22,14 @@ dom_models_error_t app_internal_messaging_callbacks_impl_validate_cfg(const app_
         !cfg->logger ||
         !cfg->logger->error ||
         !cfg->logger->info ||
-        !cfg->logger->add_callback ||
-        !cfg->logger->remove_callback ||
         !has_def_pub_functions(cfg->def_pub) ||
         !has_def_sub_functions(cfg->def_sub) ||
         !has_system_restart_functions(cfg->system_restart) ||
         !has_preloaded_repository_functions(cfg->preloaded_repository) ||
-        !has_system_info_functions(cfg->system_info)) {
+        !has_system_info_functions(cfg->system_info) ||
+        !cfg->log_forwarding ||
+        !cfg->log_forwarding->add_sink ||
+        !cfg->log_forwarding->remove_sink) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 

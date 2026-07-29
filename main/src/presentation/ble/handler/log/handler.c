@@ -26,7 +26,7 @@ static void on_gap_event(void* cb_ctx, const struct ble_gap_event* event);
 static void log_task(void* arg);
 
 pres_ble_handler_log_t* pres_ble_handler_log_new(const pres_ble_handler_log_cfg_t* cfg) {
-    if (!cfg || !cfg->logger || !cfg->gatt_registry || !cfg->host) {
+    if (!cfg || !cfg->logger || !cfg->log_forwarding || !cfg->gatt_registry || !cfg->host) {
         return NULL;
     }
 
@@ -119,9 +119,9 @@ dom_models_error_t pres_ble_handler_log_init(pres_ble_handler_log_t* self) {
     }
     self->gap_cb_subscribed = true;
 
-    err = self->cfg.logger->add_callback(self->cfg.logger, self, on_log_message);
+    err = self->cfg.log_forwarding->add_sink(self->cfg.log_forwarding, self, on_log_message);
     if (err != DOMAIN_MODELS_ERROR_OK) {
-        self->cfg.logger->error(self->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
+        self->cfg.logger->error(self->cfg.logger, tag, "Failed to subscribe to log forwarding: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
     self->logger_cb_subscribed = true;
@@ -139,7 +139,7 @@ void pres_ble_handler_log_deinit(pres_ble_handler_log_t* self) {
     }
 
     if (self->logger_cb_subscribed) {
-        self->cfg.logger->remove_callback(self->cfg.logger, on_log_message);
+        self->cfg.log_forwarding->remove_sink(self->cfg.log_forwarding, on_log_message);
         self->logger_cb_subscribed = false;
     }
 

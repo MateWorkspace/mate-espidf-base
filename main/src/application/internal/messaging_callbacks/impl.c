@@ -125,9 +125,9 @@ dom_models_error_t app_internal_messaging_callbacks_impl_init(dom_usecases_inter
         return DOMAIN_MODELS_ERROR_OK;
     }
 
-    err = ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
+    err = ctx->cfg.log_forwarding->add_sink(ctx->cfg.log_forwarding, ctx, on_log_message);
     if (err != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to log forwarding: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
     }
 
@@ -146,7 +146,7 @@ void app_internal_messaging_callbacks_impl_deinit(dom_usecases_internal_messagin
         return;
     }
 
-    ctx->cfg.logger->remove_callback(ctx->cfg.logger, on_log_message);
+    ctx->cfg.log_forwarding->remove_sink(ctx->cfg.log_forwarding, on_log_message);
     ctx->log_cb_subscribed = false;
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks deinitialized successfully");

@@ -10,6 +10,7 @@
 #include "domain/contracts/system/info.h"
 #include "domain/contracts/system/restart.h"
 #include "domain/contracts/system/update.h"
+#include "domain/usecases/internal/log_forwarding.h"
 #include "domain/usecases/internal/messaging_callbacks.h"
 #include "domain/usecases/internal/ota.h"
 #include "domain/usecases/internal/settings.h"
@@ -49,6 +50,7 @@ typedef struct {
     dom_usecases_internal_ota_t*                 ota;
     dom_usecases_internal_settings_t*            settings;
     dom_usecases_internal_wifi_manager_t*        wifi_manager;
+    dom_usecases_internal_log_forwarding_t*      log_forwarding;
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks;
 } cmp_main_launcher_application_t;
 

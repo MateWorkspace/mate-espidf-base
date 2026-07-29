@@ -96,9 +96,10 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
     }
 
     pres_ble_handler_log_cfg_t ble_log_cfg = {
-        .logger        = launcher->infrastructure.logger,
-        .gatt_registry = launcher->presentation.ble_gatt_registry,
-        .host          = launcher->presentation.ble_host,
+        .logger         = launcher->infrastructure.logger,
+        .log_forwarding = launcher->application.log_forwarding,
+        .gatt_registry  = launcher->presentation.ble_gatt_registry,
+        .host           = launcher->presentation.ble_host,
     };
     launcher->presentation.ble_log = pres_ble_handler_log_new(&ble_log_cfg);
     if (!launcher->presentation.ble_log) {

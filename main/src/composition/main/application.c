@@ -1,5 +1,6 @@
 #include "composition/main/application.h"
 
+#include "application/internal/log_forwarding/impl.h"
 #include "application/internal/messaging_callbacks/impl.h"
 #include "application/internal/ota/impl.h"
 #include "application/internal/settings/impl.h"
@@ -58,6 +59,19 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return err;
     }
 
+    app_internal_log_forwarding_impl_cfg_t log_forwarding_cfg = {
+        .logger = launcher->infrastructure.logger,
+    };
+    launcher->application.log_forwarding = app_internal_log_forwarding_impl_new(&log_forwarding_cfg);
+    if (!launcher->application.log_forwarding) {
+        return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
+    }
+
+    err = app_internal_log_forwarding_impl_init(launcher->application.log_forwarding);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     app_internal_messaging_callbacks_impl_cfg_t messaging_callbacks_cfg = {
         .logger               = launcher->infrastructure.logger,
         .def_pub              = launcher->infrastructure.def_pub,
@@ -65,6 +79,7 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         .system_restart       = launcher->infrastructure.system_restart,
         .preloaded_repository = launcher->infrastructure.preloaded_repository,
         .system_info          = launcher->infrastructure.system_info,
+        .log_forwarding       = launcher->application.log_forwarding,
     };
     launcher->application.messaging_callbacks = app_internal_messaging_callbacks_impl_new(&messaging_callbacks_cfg);
     if (!launcher->application.messaging_callbacks) {
@@ -88,6 +103,12 @@ void cmp_main_application_deinit(cmp_main_launcher_t* launcher) {
         app_internal_messaging_callbacks_impl_deinit(launcher->application.messaging_callbacks);
         app_internal_messaging_callbacks_impl_delete(launcher->application.messaging_callbacks);
         launcher->application.messaging_callbacks = NULL;
+    }
+
+    if (launcher->application.log_forwarding) {
+        app_internal_log_forwarding_impl_deinit(launcher->application.log_forwarding);
+        app_internal_log_forwarding_impl_delete(launcher->application.log_forwarding);
+        launcher->application.log_forwarding = NULL;
     }
 
     if (launcher->application.wifi_manager) {

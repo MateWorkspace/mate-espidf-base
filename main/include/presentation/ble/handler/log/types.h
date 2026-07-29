@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "domain/contracts/logger/leveled.h"
+#include "domain/usecases/internal/log_forwarding.h"
 #include "freertos/FreeRTOS.h"  // IWYU pragma: keep
 #include "freertos/queue.h"
 #include "freertos/task.h"
@@ -33,9 +34,10 @@ typedef struct {
 } pres_ble_handler_log_queue_item_t;
 
 typedef struct {
-    dom_contracts_logger_leveled_t* logger;
-    pres_ble_gatt_registry_t*       gatt_registry;
-    pres_ble_host_t*                host;
+    dom_contracts_logger_leveled_t*         logger;
+    dom_usecases_internal_log_forwarding_t* log_forwarding;
+    pres_ble_gatt_registry_t*               gatt_registry;
+    pres_ble_host_t*                        host;
 } pres_ble_handler_log_cfg_t;
 
 typedef struct pres_ble_handler_log_t {
