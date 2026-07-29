@@ -12,6 +12,10 @@ dom_usecases_internal_messaging_callbacks_t* app_internal_messaging_callbacks_im
 
 void app_internal_messaging_callbacks_impl_delete(dom_usecases_internal_messaging_callbacks_t* self);
 
+dom_models_error_t app_internal_messaging_callbacks_impl_init(dom_usecases_internal_messaging_callbacks_t* self);
+
+void app_internal_messaging_callbacks_impl_deinit(dom_usecases_internal_messaging_callbacks_t* self);
+
 #ifdef __cplusplus
 }
 #endif

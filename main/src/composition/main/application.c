@@ -71,6 +71,11 @@ dom_models_error_t cmp_main_application_init(cmp_main_launcher_t* launcher) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;
     }
 
+    err = app_internal_messaging_callbacks_impl_init(launcher->application.messaging_callbacks);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     return DOMAIN_MODELS_ERROR_OK;
 }
 
@@ -80,6 +85,7 @@ void cmp_main_application_deinit(cmp_main_launcher_t* launcher) {
     }
 
     if (launcher->application.messaging_callbacks) {
+        app_internal_messaging_callbacks_impl_deinit(launcher->application.messaging_callbacks);
         app_internal_messaging_callbacks_impl_delete(launcher->application.messaging_callbacks);
         launcher->application.messaging_callbacks = NULL;
     }

@@ -91,14 +91,6 @@ dom_usecases_internal_messaging_callbacks_t* app_internal_messaging_callbacks_im
     self->restart               = restart_impl;
     self->publish_action_ack    = publish_action_ack_impl;
 
-    err = ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
-        dom_usecases_internal_messaging_callbacks_delete(self);
-        free(ctx);
-        return NULL;
-    }
-
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks created successfully");
 
     return self;
@@ -113,12 +105,51 @@ void app_internal_messaging_callbacks_impl_delete(dom_usecases_internal_messagin
 
     app_internal_messaging_callbacks_impl_ctx_t* ctx = self->ctx;
     if (ctx) {
-        ctx->cfg.logger->remove_callback(ctx->cfg.logger, on_log_message);
         ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks deleted successfully");
         free(ctx);
     }
 
     dom_usecases_internal_messaging_callbacks_delete(self);
+}
+
+dom_models_error_t app_internal_messaging_callbacks_impl_init(dom_usecases_internal_messaging_callbacks_t* self) {
+    const char* tag = BASE_TAG "/init";
+
+    app_internal_messaging_callbacks_impl_ctx_t* ctx = NULL;
+    dom_models_error_t                           err = get_ctx(self, &ctx);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    if (ctx->log_cb_subscribed) {
+        return DOMAIN_MODELS_ERROR_OK;
+    }
+
+    err = ctx->cfg.logger->add_callback(ctx->cfg.logger, ctx, on_log_message);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to subscribe to logger callbacks: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    ctx->log_cb_subscribed = true;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks initialized successfully");
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+void app_internal_messaging_callbacks_impl_deinit(dom_usecases_internal_messaging_callbacks_t* self) {
+    const char* tag = BASE_TAG "/deinit";
+
+    app_internal_messaging_callbacks_impl_ctx_t* ctx = NULL;
+    if (get_ctx(self, &ctx) != DOMAIN_MODELS_ERROR_OK || !ctx->log_cb_subscribed) {
+        return;
+    }
+
+    ctx->cfg.logger->remove_callback(ctx->cfg.logger, on_log_message);
+    ctx->log_cb_subscribed = false;
+
+    ctx->cfg.logger->info(ctx->cfg.logger, tag, "Messaging callbacks deinitialized successfully");
 }
 
 /* Contract Function Implementations */
