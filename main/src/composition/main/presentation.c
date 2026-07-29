@@ -21,6 +21,7 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
         launcher->infrastructure.logger,
         launcher->infrastructure.preloaded_repository,
         launcher->application.messaging_callbacks,
+        launcher->application.settings,
         launcher->application.ota
     );
     if (!launcher->presentation.mqtt_context) {

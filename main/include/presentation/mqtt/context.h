@@ -7,6 +7,7 @@
 #include "domain/contracts/repository/preloaded.h"
 #include "domain/usecases/internal/messaging_callbacks.h"
 #include "domain/usecases/internal/ota.h"
+#include "domain/usecases/internal/settings.h"
 #include "mqtt_client.h"
 
 #ifdef __cplusplus
@@ -20,6 +21,7 @@ typedef struct {
     dom_contracts_repository_preloaded_t*        preloaded_repository;
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks;
     dom_usecases_internal_ota_t*                 ota;
+    dom_usecases_internal_settings_t*            settings;
     esp_mqtt_client_handle_t                     mqtt_client;
     char                                         device_id_str[37];
     bool                                         registered;
@@ -35,12 +37,14 @@ typedef struct {
     char                                         registration_ack_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
     char                                         ota_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
     char                                         action_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char                                         config_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
 } pres_mqtt_context_t;
 
 pres_mqtt_context_t* pres_mqtt_context_new(
     dom_contracts_logger_leveled_t*              logger,
     dom_contracts_repository_preloaded_t*        preloaded_repository,
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks,
+    dom_usecases_internal_settings_t*            settings,
     dom_usecases_internal_ota_t*                 ota
 );
 
