@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "presentation/mqtt/handler/action.h"
+#include "presentation/mqtt/handler/action/handler.h"
 #include "presentation/mqtt/handler/ota.h"
 #include "presentation/mqtt/handler/registration_ack.h"
 

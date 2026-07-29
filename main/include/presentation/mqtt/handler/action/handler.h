@@ -1,5 +1,5 @@
-#ifndef PRESENTATION_MQTT_HANDLER_ACTION_H
-#define PRESENTATION_MQTT_HANDLER_ACTION_H
+#ifndef PRESENTATION_MQTT_HANDLER_ACTION_HANDLER_H
+#define PRESENTATION_MQTT_HANDLER_ACTION_HANDLER_H
 
 #include "presentation/mqtt/context.h"
 
@@ -13,4 +13,4 @@ void pres_mqtt_handler_action(pres_mqtt_context_t* ctx, const char* data, int da
 }
 #endif
 
-#endif /* PRESENTATION_MQTT_HANDLER_ACTION_H */
+#endif /* PRESENTATION_MQTT_HANDLER_ACTION_HANDLER_H */
