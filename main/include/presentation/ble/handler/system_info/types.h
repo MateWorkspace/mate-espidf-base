@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-#define PRES_BLE_HANDLER_SYSTEM_INFO_INFO_JSON_MAX_LEN          192
-#define PRES_BLE_HANDLER_SYSTEM_INFO_CONFIG_SCHEMA_JSON_MAX_LEN 256
+#define PRES_BLE_HANDLER_SYSTEM_INFO_INFO_JSON_MAX_LEN          512
+#define PRES_BLE_HANDLER_SYSTEM_INFO_CONFIG_SCHEMA_JSON_MAX_LEN 512
 
 typedef struct {
     dom_contracts_logger_leveled_t*      logger;
