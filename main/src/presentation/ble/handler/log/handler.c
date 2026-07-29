@@ -14,10 +14,12 @@
 
 #define BASE_TAG "ble/handler/log"
 
-/* Global-lifetime GATT storage, same rationale as the other two handlers
-   (see settings/handler.c) - only one log BLE handler instance exists. */
+/* Lifetime BLE Definitions */
+
 static struct ble_gatt_chr_def characteristic_defs[3];
 static struct ble_gatt_svc_def service_defs[2];
+
+/* Access Callback Function Prototypes */
 
 static int message_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int enabled_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
@@ -25,6 +27,8 @@ static int enabled_access_callback(uint16_t conn_handle, uint16_t attr_handle, s
 static void on_log_message(void* cb_ctx, const char* msg, size_t msg_len);
 static void on_gap_event(void* cb_ctx, const struct ble_gap_event* event);
 static void log_task(void* arg);
+
+/* Constructors and Destructors */
 
 pres_ble_handler_log_t* pres_ble_handler_log_new(const pres_ble_handler_log_cfg_t* cfg) {
     if (pres_ble_handler_log_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
@@ -173,9 +177,8 @@ void pres_ble_handler_log_deinit(pres_ble_handler_log_t* self) {
     self->registered = false;
 }
 
-/* Runs synchronously on whichever task called logger->error/warn/info/
-   debug(...) - see types.h's comment on why every field this touches must
-   stay a cheap volatile read, and why it never calls into NimBLE itself. */
+/* Access Callback Function Implementations */
+
 static void on_log_message(void* cb_ctx, const char* msg, size_t msg_len) {
     pres_ble_handler_log_t* self = cb_ctx;
     if (!self || !msg || msg_len == 0) {

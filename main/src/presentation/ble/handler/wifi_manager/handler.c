@@ -14,12 +14,12 @@
 
 #define BASE_TAG "ble/handler/wifi_manager"
 
-/* Global-lifetime GATT storage, same rationale as the settings handler
-   (see its handler.c) - NimBLE retains raw pointers into these forever
-   once registered, and there is only ever one wifi_manager BLE handler
-   instance in this app. */
+/* Lifetime BLE Definitions */
+
 static struct ble_gatt_chr_def characteristic_defs[6];
 static struct ble_gatt_svc_def service_defs[2];
+
+/* Access Callback Function Prototypes */
 
 static int status_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int connect_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
@@ -27,7 +27,11 @@ static int command_access_callback(uint16_t conn_handle, uint16_t attr_handle, s
 static int stored_credential_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int try_connect_on_init_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 
+/* WiFi Status Event Prototype */
+
 static void on_wifi_status_event(void* cb_ctx, const dom_models_wifi_event_t* event);
+
+/* Constructors and Desctructors */
 
 pres_ble_handler_wifi_manager_t* pres_ble_handler_wifi_manager_new(const pres_ble_handler_wifi_manager_cfg_t* cfg) {
     if (pres_ble_handler_wifi_manager_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
@@ -145,6 +149,8 @@ void pres_ble_handler_wifi_manager_deinit(pres_ble_handler_wifi_manager_t* self)
     self->registered = false;
 }
 
+/* WiFi Status Event Implementation */
+
 static void on_wifi_status_event(void* cb_ctx, const dom_models_wifi_event_t* event) {
     (void)event;
 
@@ -158,6 +164,8 @@ static void on_wifi_status_event(void* cb_ctx, const dom_models_wifi_event_t* ev
        notification payload, so there's nothing to format/send here. */
     ble_gatts_chr_updated(self->status_chr_hdl);
 }
+
+/* Access Callback Function Implementations */
 
 static int status_access_callback(
     uint16_t                     conn_handle,

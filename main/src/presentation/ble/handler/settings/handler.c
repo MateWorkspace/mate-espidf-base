@@ -14,19 +14,19 @@
 
 #define BASE_TAG "ble/handler/settings"
 
-/* Global-lifetime GATT storage - NimBLE retains raw pointers into these
-   forever once ble_gatts_add_svcs() runs (see gatt/registry.h), so they
-   cannot be stack- or heap-owned by a struct that might be freed. There is
-   only ever one settings handler instance in this app, so file-scope
-   static storage (rather than something allocated per handler instance) is
-   both correct and the simplest option that satisfies that constraint. */
+/* Lifetime BLE Definitions */
+
 static struct ble_gatt_chr_def characteristic_defs[5];
 static struct ble_gatt_svc_def service_defs[2];
+
+/* Access Callback Function Prototypes */
 
 static int data_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int update_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int restart_required_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int restart_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
+
+/* Constructors and Destructors */
 
 pres_ble_handler_settings_t* pres_ble_handler_settings_new(const pres_ble_handler_settings_cfg_t* cfg) {
     if (pres_ble_handler_settings_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
@@ -121,6 +121,8 @@ void pres_ble_handler_settings_deinit(pres_ble_handler_settings_t* self) {
 
     self->registered = false;
 }
+
+/* Access Callback Function Implementations */
 
 static int data_access_callback(
     uint16_t                     conn_handle,
