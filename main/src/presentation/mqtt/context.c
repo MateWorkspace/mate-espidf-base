@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "domain/models/error.h"
+#include "presentation/mqtt/context_utils.h"
 #include "presentation/mqtt/event/event_handler.h"
 
 #define BASE_TAG "pres_mqtt_context"
@@ -14,7 +15,7 @@ pres_mqtt_context_t* pres_mqtt_context_new(
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks,
     dom_usecases_internal_ota_t*                 ota
 ) {
-    if (!logger || !preloaded_repository || !messaging_callbacks || !ota) {
+    if (pres_mqtt_context_validate_cfg(logger, preloaded_repository, messaging_callbacks, ota) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 

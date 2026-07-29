@@ -10,6 +10,7 @@
 #include "presentation/ble/gatt/util.h"
 #include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/settings/dto.h"
+#include "presentation/ble/handler/settings/utils.h"
 
 #define BASE_TAG "ble/handler/settings"
 
@@ -28,7 +29,7 @@ static int restart_required_access_callback(uint16_t conn_handle, uint16_t attr_
 static int restart_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 
 pres_ble_handler_settings_t* pres_ble_handler_settings_new(const pres_ble_handler_settings_cfg_t* cfg) {
-    if (!cfg || !cfg->logger || !cfg->settings || !cfg->gatt_registry) {
+    if (pres_ble_handler_settings_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 

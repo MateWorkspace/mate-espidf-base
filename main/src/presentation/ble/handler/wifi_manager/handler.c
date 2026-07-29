@@ -10,6 +10,7 @@
 #include "presentation/ble/gatt/util.h"
 #include "presentation/ble/gatt/uuid.h"
 #include "presentation/ble/handler/wifi_manager/dto.h"
+#include "presentation/ble/handler/wifi_manager/utils.h"
 
 #define BASE_TAG "ble/handler/wifi_manager"
 
@@ -29,7 +30,7 @@ static int try_connect_on_init_access_callback(uint16_t conn_handle, uint16_t at
 static void on_wifi_status_event(void* cb_ctx, const dom_models_wifi_event_t* event);
 
 pres_ble_handler_wifi_manager_t* pres_ble_handler_wifi_manager_new(const pres_ble_handler_wifi_manager_cfg_t* cfg) {
-    if (!cfg || !cfg->logger || !cfg->wifi_manager || !cfg->gatt_registry) {
+    if (pres_ble_handler_wifi_manager_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 

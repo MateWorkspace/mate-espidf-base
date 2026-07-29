@@ -10,6 +10,7 @@
 #include "host/ble_hs.h"
 #include "presentation/ble/gatt/util.h"
 #include "presentation/ble/gatt/uuid.h"
+#include "presentation/ble/handler/log/utils.h"
 
 #define BASE_TAG "ble/handler/log"
 
@@ -26,7 +27,7 @@ static void on_gap_event(void* cb_ctx, const struct ble_gap_event* event);
 static void log_task(void* arg);
 
 pres_ble_handler_log_t* pres_ble_handler_log_new(const pres_ble_handler_log_cfg_t* cfg) {
-    if (!cfg || !cfg->logger || !cfg->log_forwarding || !cfg->gatt_registry || !cfg->host) {
+    if (pres_ble_handler_log_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 

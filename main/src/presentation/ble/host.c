@@ -9,6 +9,7 @@
 #include "host/util/util.h"
 #include "nimble/nimble_port.h"
 #include "nimble/nimble_port_freertos.h"
+#include "presentation/ble/host_utils.h"
 #include "services/gap/ble_svc_gap.h"
 
 #define TAG_PATH "ble/host"
@@ -29,7 +30,7 @@ static void on_sync(void);
 static void host_task(void* param);
 
 pres_ble_host_t* pres_ble_host_new(const pres_ble_host_cfg_t* cfg) {
-    if (!cfg || !cfg->logger || !cfg->gatt_registry) {
+    if (pres_ble_host_validate_cfg(cfg) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 
