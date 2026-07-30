@@ -1,0 +1,7 @@
+{
+  "url": "http://<backend-host>:8080/api",
+  "username": "admin",
+  "password": "<password>",
+  "filename": "build/mate-espidf-base.bin",
+  "node_class_name": "base_node"
+}

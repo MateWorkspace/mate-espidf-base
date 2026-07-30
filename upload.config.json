@@ -1,8 +1,0 @@
-{
-  "url": "http://192.168.18.192:8080/api",
-  "username": "admin",
-  "password": "ChangeMe123!",
-  "filename": "build/mate-espidf-base.bin",
-  "node_class_name": "base_node",
-  "firmware_name": "mate-espidf-base_v1.0.0-dev.1"
-}
