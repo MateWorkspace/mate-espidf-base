@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Upload the built firmware binary to the mate-things backend for OTA testing.
 
-Reads upload.config.json (url, username, password, filename, node_class_name,
-firmware_name), logs in, resolves the node class, then either creates a new
-firmware row (POST /v1/firmwares) or - if a firmware with that name already
-exists - replaces its binary in place (PUT /v1/firmwares/{id}/binary), so
-re-running this after every rebuild just updates the same firmware entry
-instead of erroring on a duplicate name.
+Reads upload.config.json (url, username, password, filename, node_class_name),
+logs in, resolves the node class, then either creates a new firmware row
+(POST /v1/firmwares) or - if a firmware with that name already exists -
+replaces its binary in place (PUT /v1/firmwares/{id}/binary), so re-running
+this after every rebuild just updates the same firmware entry instead of
+erroring on a duplicate name.
 
-firmware_name must exactly match what the device sends as `firmware_name` at
-MQTT registration (`<PROJECT_NAME>-<PROJECT_VERSION>`, see main/CMakeLists.txt
-and messaging_callbacks' registration payload) - the backend keys firmware
-lookups by that name.
+firmware_name is derived automatically (not read from config) as
+`<project_name>_<project_version>`, matching what the device sends as
+`firmware_name` at MQTT registration: project_name comes from the root
+CMakeLists.txt's project(...) call and project_version comes from
+version.txt - the backend keys firmware lookups by that name.
 
 Usage:
     python3 upload.py [path/to/config.json]

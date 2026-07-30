@@ -104,11 +104,15 @@ Reads `upload.config.json`, logs in, resolves the `base_node` node class
 (created by the backend's seeder), and creates-or-replaces a firmware row
 named to exactly match what the device's own registration payload sends
 (`<PROJECT_NAME>_<PROJECT_VERSION>`, currently
-`mate-espidf-base_v1.0.0-dev.1` — **must stay in sync with
-`upload.config.json`'s `firmware_name` if either the project name or
-version string ever changes**, or registration will silently fail, see
-`09-known-gaps-summary.md`). Prints the firmware id and a freshly-issued
+`mate-espidf-base_v1.0.0-dev.1`). This name is derived automatically by
+`upload.py` from the root `CMakeLists.txt`'s `project(...)` call and
+`version.txt`, so it requires no manual syncing even if the project name or
+version string changes. Prints the firmware id and a freshly-issued
 presigned download URL for OTA testing.
+
+Before running this for the first time, copy `upload.config.json.example` to
+`upload.config.json` and fill in real values (`url`, `username`, `password`,
+`filename`, `node_class_name`).
 
 ## Step 5 — Get the device's MQTT identity
 
