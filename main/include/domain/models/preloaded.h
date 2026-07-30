@@ -37,7 +37,7 @@ typedef struct {
 } dom_models_preloaded_schema_entry_t;
 
 #define DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT_X(cb_name, cb_key, cb_type) +1
-#define DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT                            (0 DOMAIN_MODELS_PRELOADED_SCHEMA(DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT_X))
+#define DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT                             (0 DOMAIN_MODELS_PRELOADED_SCHEMA(DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT_X))
 
 extern const dom_models_preloaded_schema_entry_t dom_models_preloaded_schema[DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT];
 

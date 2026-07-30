@@ -13,12 +13,12 @@
 
 /* Default Values */
 
-#define DEFAULT_MQTT_PROTO              "mqtt"
-#define DEFAULT_MQTT_HOST               "192.168.1.1"
-#define DEFAULT_MQTT_PORT               "1883"
-#define DEFAULT_MQTT_USER               ""
-#define DEFAULT_MQTT_PASS               ""
-#define DEFAULT_SYSTEM_RESTART_AFTER_MS 0xFFFFFFFF
+#define DEFAULT_MQTT_PROTO                   "mqtt"
+#define DEFAULT_MQTT_HOST                    "192.168.1.1"
+#define DEFAULT_MQTT_PORT                    "1883"
+#define DEFAULT_MQTT_USER                    ""
+#define DEFAULT_MQTT_PASS                    ""
+#define DEFAULT_SYSTEM_RESTART_AFTER_MS      0xFFFFFFFF
 #define DEFAULT_WIFI_STA_TRY_CONNECT_ON_INIT false
 
 #define DEVICE_ID_STR_LEN 12
