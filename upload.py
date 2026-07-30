@@ -71,6 +71,25 @@ def parse_preloaded_schema(repo_root: Path) -> list[dict]:
     return schema
 
 
+_PROJECT_NAME_RE = re.compile(r"project\(\s*([^)\s]+)\s*\)")
+
+
+def parse_project_name(repo_root: Path) -> str:
+    text = (repo_root / "CMakeLists.txt").read_text()
+    match = _PROJECT_NAME_RE.search(text)
+    if not match:
+        raise SystemExit("could not find project(...) in CMakeLists.txt")
+    return match.group(1)
+
+
+def parse_project_version(repo_root: Path) -> str:
+    return (repo_root / "version.txt").read_text().strip()
+
+
+def build_firmware_name(repo_root: Path) -> str:
+    return f"{parse_project_name(repo_root)}_{parse_project_version(repo_root)}"
+
+
 def login(base_url: str, username: str, password: str) -> str:
     resp = requests.post(
         f"{base_url}/v1/auth/login",
@@ -164,13 +183,15 @@ def main() -> None:
     config_schema = parse_preloaded_schema(Path(__file__).parent)
     print(f"Parsed {len(config_schema)} config parameter(s) from preloaded.h")
 
+    firmware_name = build_firmware_name(Path(__file__).parent)
+    print(f"Resolved firmware_name: {firmware_name}")
+
     print(f"Logging in to {base_url} as {config['username']}...")
     token = login(base_url, config["username"], config["password"])
 
     print(f"Resolving node class '{config['node_class_name']}'...")
     node_class_id = get_node_class_id(base_url, token, config["node_class_name"])
 
-    firmware_name = config["firmware_name"]
     existing_id = find_existing_firmware_id(base_url, token, firmware_name)
 
     if existing_id:
