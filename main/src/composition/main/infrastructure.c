@@ -11,6 +11,10 @@
 #include "infrastructure/system/restart/esp_impl.h"
 #include "infrastructure/system/update/esp_https_impl.h"
 
+#include "esp_netif_sntp.h"
+
+#define NTP_SERVER "pool.ntp.org"
+
 dom_models_error_t cmp_main_infrastructure_init(cmp_main_launcher_t* launcher) {
     if (!launcher) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
@@ -66,6 +70,12 @@ dom_models_error_t cmp_main_infrastructure_init(cmp_main_launcher_t* launcher) {
     dom_models_error_t err = inf_device_wifi_esp_impl_init(launcher->infrastructure.wifi);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         return err;
+    }
+
+    esp_sntp_config_t sntp_cfg = ESP_NETIF_SNTP_DEFAULT_CONFIG(NTP_SERVER);
+    esp_err_t          sntp_err = esp_netif_sntp_init(&sntp_cfg);
+    if (sntp_err != ESP_OK) {
+        return DOMAIN_MODELS_ERROR_FAILURE;
     }
 
     inf_messaging_def_pub_mqtt_impl_cfg_t def_pub_cfg = {

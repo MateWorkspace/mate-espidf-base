@@ -9,6 +9,8 @@
 #include "domain/models/wifi.h"
 #include "domain/usecases/internal/wifi_manager.h"
 
+#include "esp_netif_sntp.h"
+
 #define BASE_TAG "internal_wifi_manager"
 
 /* Helper Function Prototypes */
@@ -691,6 +693,9 @@ static void on_wifi_event(void* cb_ctx, const dom_models_wifi_event_t* event) {
                 );
             } else {
                 ctx->cfg.logger->info(ctx->cfg.logger, tag, "WiFi connected");
+            }
+            if (esp_netif_sntp_start() == ESP_OK) {
+                ctx->cfg.logger->info(ctx->cfg.logger, tag, "SNTP time sync (re)triggered");
             }
             break;
         }
