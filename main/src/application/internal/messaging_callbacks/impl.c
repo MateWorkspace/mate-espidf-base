@@ -1,5 +1,6 @@
 #include "application/internal/messaging_callbacks/impl.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -7,6 +8,7 @@
 #include "application/internal/messaging_callbacks/impl_utils.h"
 #include "domain/models/device_status.h"
 #include "domain/models/error.h"
+#include "domain/models/preloaded.h"
 #include "domain/models/system.h"
 #include "domain/usecases/internal/messaging_callbacks.h"
 
@@ -202,7 +204,72 @@ static dom_models_error_t publish_registration_impl(
         return err;
     }
 
-    err = ctx->cfg.def_pub->registration(ctx->cfg.def_pub, device_id_str, device_info, firmware_name);
+    char mqtt_proto[16];
+    err = ctx->cfg.preloaded_repository->get_mqtt_proto(ctx->cfg.preloaded_repository, mqtt_proto, sizeof(mqtt_proto));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load mqtt_proto: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    char mqtt_host[128];
+    err = ctx->cfg.preloaded_repository->get_mqtt_host(ctx->cfg.preloaded_repository, mqtt_host, sizeof(mqtt_host));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load mqtt_host: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    char mqtt_port[8];
+    err = ctx->cfg.preloaded_repository->get_mqtt_port(ctx->cfg.preloaded_repository, mqtt_port, sizeof(mqtt_port));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load mqtt_port: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    char mqtt_user[64];
+    err = ctx->cfg.preloaded_repository->get_mqtt_user(ctx->cfg.preloaded_repository, mqtt_user, sizeof(mqtt_user));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load mqtt_user: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    char mqtt_pass[128];
+    err = ctx->cfg.preloaded_repository->get_mqtt_pass(ctx->cfg.preloaded_repository, mqtt_pass, sizeof(mqtt_pass));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load mqtt_pass: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    uint32_t system_restart_after_ms = 0;
+    err                              = ctx->cfg.preloaded_repository->get_system_restart_after_ms(ctx->cfg.preloaded_repository, &system_restart_after_ms);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load system_restart_after_ms: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+    char system_restart_after_ms_str[11];
+    int  written = snprintf(system_restart_after_ms_str, sizeof(system_restart_after_ms_str), "%lu", (unsigned long)system_restart_after_ms);
+    if (written <= 0 || (size_t)written >= sizeof(system_restart_after_ms_str)) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to format system_restart_after_ms: %s (%d)", dom_models_error_str(DOMAIN_MODELS_ERROR_FAILURE), (int)DOMAIN_MODELS_ERROR_FAILURE);
+        return DOMAIN_MODELS_ERROR_FAILURE;
+    }
+
+    bool wifi_try_init = false;
+    err                = ctx->cfg.preloaded_repository->get_wifi_sta_try_connect_on_init(ctx->cfg.preloaded_repository, &wifi_try_init);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to load wifi_try_init: %s (%d)", dom_models_error_str(err), (int)err);
+        return err;
+    }
+
+    const dom_models_preloaded_kv_t config[] = {
+        {DOMAIN_MODELS_PRELOADED_MQTT_PROTO_KEY, mqtt_proto},
+        {DOMAIN_MODELS_PRELOADED_MQTT_HOST_KEY, mqtt_host},
+        {DOMAIN_MODELS_PRELOADED_MQTT_PORT_KEY, mqtt_port},
+        {DOMAIN_MODELS_PRELOADED_MQTT_USER_KEY, mqtt_user},
+        {DOMAIN_MODELS_PRELOADED_MQTT_PASS_KEY, mqtt_pass},
+        {DOMAIN_MODELS_PRELOADED_SYSTEM_RESTART_AFTER_MS_KEY, system_restart_after_ms_str},
+        {DOMAIN_MODELS_PRELOADED_WIFI_STA_TRY_CONNECT_ON_INIT_KEY, wifi_try_init ? "true" : "false"},
+    };
+
+    err = ctx->cfg.def_pub->registration(ctx->cfg.def_pub, device_id_str, device_info, firmware_name, config, sizeof(config) / sizeof(config[0]));
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to publish registration: %s (%d)", dom_models_error_str(err), (int)err);
         return err;
