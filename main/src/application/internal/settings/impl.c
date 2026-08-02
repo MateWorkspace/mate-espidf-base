@@ -192,6 +192,15 @@ static dom_models_error_t set_preloaded_impl(
         ctx->restart_required = true;
     }
 
+    if (update->wifi_try_init_set) {
+        err = ctx->cfg.preloaded_repository->set_wifi_sta_try_connect_on_init(ctx->cfg.preloaded_repository, update->wifi_try_init);
+        if (err != DOMAIN_MODELS_ERROR_OK) {
+            ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to set WiFi try-connect-on-init: %s (%d)", dom_models_error_str(err), (int)err);
+            return err;
+        }
+        ctx->restart_required = true;
+    }
+
     if (restart_required_out) {
         *restart_required_out = ctx->restart_required;
     }

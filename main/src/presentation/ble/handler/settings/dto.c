@@ -25,6 +25,7 @@ size_t pres_ble_handler_settings_dto_encode_snapshot(
     cJSON_AddStringToObject(root, "mqtt_user", snapshot->mqtt_user);
     cJSON_AddBoolToObject(root, "mqtt_pass_set", snapshot->mqtt_pass[0] != '\0');
     cJSON_AddNumberToObject(root, "system_restart_after_ms", snapshot->system_restart_after_ms);
+    cJSON_AddBoolToObject(root, "wifi_try_init", snapshot->wifi_sta_try_connect_on_init);
 
     bool ok = cJSON_PrintPreallocated(root, buf, (int)buf_cap, false);
     cJSON_Delete(root);
@@ -90,6 +91,12 @@ dom_models_error_t pres_ble_handler_settings_dto_decode_update(
     if (cJSON_IsNumber(restart_after_ms_item)) {
         out->system_restart_after_ms     = (uint32_t)restart_after_ms_item->valuedouble;
         out->system_restart_after_ms_set = true;
+    }
+
+    cJSON* wifi_try_init_item = cJSON_GetObjectItemCaseSensitive(root, "wifi_try_init");
+    if (cJSON_IsBool(wifi_try_init_item)) {
+        out->wifi_try_init     = cJSON_IsTrue(wifi_try_init_item);
+        out->wifi_try_init_set = true;
     }
 
     cJSON_Delete(root);

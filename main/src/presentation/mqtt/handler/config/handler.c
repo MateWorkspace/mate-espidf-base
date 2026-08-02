@@ -103,15 +103,9 @@ void pres_mqtt_handler_config(pres_mqtt_context_t* ctx, const char* data, int da
             }
 
             if (strcmp(request.key, DOMAIN_MODELS_PRELOADED_WIFI_STA_TRY_CONNECT_ON_INIT_KEY) == 0) {
-                /* The underlying setting IS writable - dom_usecases_internal_wifi_manager_t
-                   .set_try_connect_on_init exists and BLE's wifi_manager handler already
-                   calls it. The gap is wiring only: pres_mqtt_context_t holds no
-                   wifi_manager reference, so this handler cannot reach it, and
-                   dom_usecases_internal_settings_preloaded_update_t (the only path it
-                   does have) carries no wifi_sta_try_connect_on_init field.
-                   Log and skip rather than silently no-op. */
-                ctx->logger->warn(ctx->logger, tag, "Config key %s is not writable via MQTT (MQTT context has no wifi_manager reference; use BLE)", request.key);
-                return;
+                update.wifi_try_init     = strcmp(request.value, "true") == 0;
+                update.wifi_try_init_set = true;
+                handled                  = true;
             }
             break;
         }

@@ -47,6 +47,7 @@ struct dom_usecases_internal_settings_snapshot_t {
     char mqtt_pass[128];
 
     uint32_t system_restart_after_ms;
+    bool     wifi_sta_try_connect_on_init;
 };
 
 struct dom_usecases_internal_settings_preloaded_update_t {
@@ -67,6 +68,9 @@ struct dom_usecases_internal_settings_preloaded_update_t {
 
     bool     system_restart_after_ms_set;
     uint32_t system_restart_after_ms;
+
+    bool wifi_try_init_set;
+    bool wifi_try_init;
 };
 
 static inline dom_usecases_internal_settings_t* dom_usecases_internal_settings_new(void* ctx) {

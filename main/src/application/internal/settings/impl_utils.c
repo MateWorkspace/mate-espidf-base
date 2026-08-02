@@ -73,6 +73,11 @@ dom_models_error_t app_internal_settings_impl_load_snapshot(
         return err;
     }
 
+    err = ctx->cfg.preloaded_repository->get_wifi_sta_try_connect_on_init(ctx->cfg.preloaded_repository, &out->wifi_sta_try_connect_on_init);
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
     return DOMAIN_MODELS_ERROR_OK;
 }
 
@@ -83,7 +88,8 @@ bool app_internal_settings_impl_has_preloaded_update(const dom_usecases_internal
             update->mqtt_port_set ||
             update->mqtt_user_set ||
             update->mqtt_pass_set ||
-            update->system_restart_after_ms_set);
+            update->system_restart_after_ms_set ||
+            update->wifi_try_init_set);
 }
 
 /* Helper Function Implementations */
@@ -103,7 +109,9 @@ static bool has_preloaded_repository_functions(dom_contracts_repository_preloade
            preloaded_repository->get_mqtt_pass &&
            preloaded_repository->set_mqtt_pass &&
            preloaded_repository->get_system_restart_after_ms &&
-           preloaded_repository->set_system_restart_after_ms;
+           preloaded_repository->set_system_restart_after_ms &&
+           preloaded_repository->get_wifi_sta_try_connect_on_init &&
+           preloaded_repository->set_wifi_sta_try_connect_on_init;
 }
 
 static bool has_system_restart_functions(dom_contracts_system_restart_t* system_restart) {
