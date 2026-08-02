@@ -7,6 +7,7 @@
 #include "domain/contracts/system/update.h"
 #include "domain/models/error.h"
 #include "domain/models/update.h"
+#include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
@@ -337,6 +338,7 @@ static dom_models_error_t perform_update(
     esp_http_client_config_t http_cfg = {
         .url                         = update_info->firmware_url,
         .cert_pem                    = ctx->cfg.cert_pem,
+        .crt_bundle_attach           = ctx->cfg.cert_pem ? NULL : esp_crt_bundle_attach,
         .timeout_ms                  = ctx->cfg.http_timeout_ms,
         .buffer_size                 = ctx->cfg.http_read_buffer_size,
         .keep_alive_enable           = ctx->cfg.keep_alive_enable,
