@@ -8,7 +8,6 @@
 #include "domain/models/error.h"
 #include "domain/models/wifi.h"
 #include "domain/usecases/internal/wifi_manager.h"
-
 #include "esp_netif_sntp.h"
 
 #define BASE_TAG "internal_wifi_manager"
@@ -441,7 +440,7 @@ static dom_models_error_t need_reconnect_impl(
     }
 
     if (!ctx->connect_attempted && !try_connect_on_init) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because no connection trial has happened yet and try-connect-on-init is disabled");
+        // ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because no connection trial has happened yet and try-connect-on-init is disabled");
         return DOMAIN_MODELS_ERROR_OK;
     }
 
@@ -453,14 +452,14 @@ static dom_models_error_t need_reconnect_impl(
     }
 
     if (status.sta_connection_status == DOM_MODELS_WIFI_STA_STATUS_CONNECTED) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because STA is connected");
+        // ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because STA is connected");
         return DOMAIN_MODELS_ERROR_OK;
     }
 
     dom_models_wifi_sta_connect_config_t credential;
     err = ctx->cfg.wifi_repository->get_sta_credential(ctx->cfg.wifi_repository, &credential);
     if (err == DOMAIN_MODELS_ERROR_NOT_FOUND) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because no stored credential is available");
+        // ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because no stored credential is available");
         return DOMAIN_MODELS_ERROR_OK;
     }
     if (err != DOMAIN_MODELS_ERROR_OK) {
@@ -469,7 +468,7 @@ static dom_models_error_t need_reconnect_impl(
     }
 
     if (app_internal_wifi_manager_impl_validate_credential(&credential) != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because stored credential is invalid");
+        // ctx->cfg.logger->info(ctx->cfg.logger, tag, "Reconnect is not needed because stored credential is invalid");
         return DOMAIN_MODELS_ERROR_OK;
     }
 
