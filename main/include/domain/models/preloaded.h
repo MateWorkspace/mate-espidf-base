@@ -36,6 +36,11 @@ typedef struct {
     dom_models_preloaded_value_type_t type;
 } dom_models_preloaded_schema_entry_t;
 
+typedef struct {
+    const char* key;
+    const char* value;
+} dom_models_preloaded_kv_t;
+
 #define DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT_X(cb_name, cb_key, cb_type) +1
 #define DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT                             (0 DOMAIN_MODELS_PRELOADED_SCHEMA(DOMAIN_MODELS_PRELOADED_SCHEMA_COUNT_X))
 

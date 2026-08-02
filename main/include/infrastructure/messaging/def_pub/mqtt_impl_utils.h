@@ -6,6 +6,7 @@
 
 #include "domain/models/device_status.h"
 #include "domain/models/error.h"
+#include "domain/models/preloaded.h"
 #include "infrastructure/messaging/def_pub/mqtt_impl_types.h"
 
 #ifdef __cplusplus
@@ -26,9 +27,11 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_build_device_topic(
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
-    const char* device_id,
-    const char* device_info,
-    const char* firmware_name
+    const char*                       device_id,
+    const char*                       device_info,
+    const char*                       firmware_name,
+    const dom_models_preloaded_kv_t*  config,
+    size_t                            config_count
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_status_json(

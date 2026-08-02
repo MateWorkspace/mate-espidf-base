@@ -40,9 +40,11 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_build_device_topic(
 }
 
 char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
-    const char* device_id,
-    const char* device_info,
-    const char* firmware_name
+    const char*                      device_id,
+    const char*                      device_info,
+    const char*                      firmware_name,
+    const dom_models_preloaded_kv_t* config,
+    size_t                           config_count
 ) {
     if (!cstr_available(device_id) || !cstr_available(device_info) || !cstr_available(firmware_name)) {
         return NULL;
@@ -58,6 +60,25 @@ char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
         !cJSON_AddStringToObject(root, "firmware_name", firmware_name)) {
         cJSON_Delete(root);
         return NULL;
+    }
+
+    /* Always emit a (possibly empty) "config" object - every value is a
+       string, matching how node_config_values.value and the config-set
+       MQTT payload already represent config values on the backend, so the
+       registration handler there doesn't need a second parsing convention. */
+    cJSON* config_obj = cJSON_AddObjectToObject(root, "config");
+    if (!config_obj) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+    for (size_t i = 0; i < config_count; i++) {
+        if (!config || !config[i].key || !config[i].value) {
+            continue;
+        }
+        if (!cJSON_AddStringToObject(config_obj, config[i].key, config[i].value)) {
+            cJSON_Delete(root);
+            return NULL;
+        }
     }
 
     char* json = cJSON_PrintUnformatted(root);

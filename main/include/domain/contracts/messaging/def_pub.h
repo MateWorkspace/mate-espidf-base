@@ -7,6 +7,7 @@
 
 #include "domain/models/device_status.h"
 #include "domain/models/error.h"
+#include "domain/models/preloaded.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +25,9 @@ struct dom_contracts_messaging_def_pub_t {
         dom_contracts_messaging_def_pub_t* self,
         const char*                        device_id,
         const char*                        device_info,
-        const char*                        firmware_name
+        const char*                        firmware_name,
+        const dom_models_preloaded_kv_t*   config,
+        size_t                             config_count
     );
     dom_models_error_t (*status)(
         dom_contracts_messaging_def_pub_t* self,

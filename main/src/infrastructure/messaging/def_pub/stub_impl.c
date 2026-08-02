@@ -17,7 +17,9 @@ static dom_models_error_t registration_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
     const char*                        device_info,
-    const char*                        firmware_name
+    const char*                        firmware_name,
+    const dom_models_preloaded_kv_t*   config,
+    size_t                             config_count
 );
 static dom_models_error_t status_impl(
     dom_contracts_messaging_def_pub_t* self,
@@ -99,8 +101,13 @@ static dom_models_error_t registration_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
     const char*                        device_info,
-    const char*                        firmware_name
+    const char*                        firmware_name,
+    const dom_models_preloaded_kv_t*   config,
+    size_t                             config_count
 ) {
+    (void)config;
+    (void)config_count;
+
     if (!self || !self->ctx) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
