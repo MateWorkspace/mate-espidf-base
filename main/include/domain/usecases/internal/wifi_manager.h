@@ -45,14 +45,6 @@ struct dom_usecases_internal_wifi_manager_t {
     dom_models_error_t (*forget_stored_credential)(
         dom_usecases_internal_wifi_manager_t* self
     );
-    dom_models_error_t (*get_try_connect_on_init)(
-        dom_usecases_internal_wifi_manager_t* self,
-        bool*                                 out
-    );
-    dom_models_error_t (*set_try_connect_on_init)(
-        dom_usecases_internal_wifi_manager_t* self,
-        bool                                  enabled
-    );
     dom_models_error_t (*need_reconnect)(
         dom_usecases_internal_wifi_manager_t* self,
         bool*                                 out

@@ -49,14 +49,6 @@ static dom_models_error_t get_stored_credential_impl(
 static dom_models_error_t forget_stored_credential_impl(
     dom_usecases_internal_wifi_manager_t* self
 );
-static dom_models_error_t get_try_connect_on_init_impl(
-    dom_usecases_internal_wifi_manager_t* self,
-    bool*                                 out
-);
-static dom_models_error_t set_try_connect_on_init_impl(
-    dom_usecases_internal_wifi_manager_t* self,
-    bool                                  enabled
-);
 static dom_models_error_t need_reconnect_impl(
     dom_usecases_internal_wifi_manager_t* self,
     bool*                                 out
@@ -113,8 +105,6 @@ dom_usecases_internal_wifi_manager_t* app_internal_wifi_manager_impl_new(const a
     self->disconnect               = disconnect_impl;
     self->get_stored_credential    = get_stored_credential_impl;
     self->forget_stored_credential = forget_stored_credential_impl;
-    self->get_try_connect_on_init  = get_try_connect_on_init_impl;
-    self->set_try_connect_on_init  = set_try_connect_on_init_impl;
     self->need_reconnect           = need_reconnect_impl;
     self->try_reconnect            = try_reconnect_impl;
     self->add_status_callback      = add_status_callback_impl;
@@ -419,58 +409,6 @@ static dom_models_error_t forget_stored_credential_impl(
     }
 
     ctx->cfg.logger->info(ctx->cfg.logger, tag, "Stored STA credential forgotten successfully");
-
-    return DOMAIN_MODELS_ERROR_OK;
-}
-
-static dom_models_error_t get_try_connect_on_init_impl(
-    dom_usecases_internal_wifi_manager_t* self,
-    bool*                                 out
-) {
-    const char* tag = BASE_TAG "/get_try_connect_on_init";
-
-    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
-    dom_models_error_t                    err = get_ctx(self, &ctx);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        return err;
-    }
-
-    if (!out) {
-        err = DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Missing try-connect-on-init output: %s (%d)", dom_models_error_str(err), (int)err);
-        return err;
-    }
-
-    err = ctx->cfg.preloaded_repository->get_wifi_sta_try_connect_on_init(ctx->cfg.preloaded_repository, out);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to get try-connect-on-init flag: %s (%d)", dom_models_error_str(err), (int)err);
-        return err;
-    }
-
-    ctx->cfg.logger->info(ctx->cfg.logger, tag, "Try-connect-on-init flag retrieved successfully");
-
-    return DOMAIN_MODELS_ERROR_OK;
-}
-
-static dom_models_error_t set_try_connect_on_init_impl(
-    dom_usecases_internal_wifi_manager_t* self,
-    bool                                  enabled
-) {
-    const char* tag = BASE_TAG "/set_try_connect_on_init";
-
-    app_internal_wifi_manager_impl_ctx_t* ctx = NULL;
-    dom_models_error_t                    err = get_ctx(self, &ctx);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        return err;
-    }
-
-    err = ctx->cfg.preloaded_repository->set_wifi_sta_try_connect_on_init(ctx->cfg.preloaded_repository, enabled);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to set try-connect-on-init flag: %s (%d)", dom_models_error_str(err), (int)err);
-        return err;
-    }
-
-    ctx->cfg.logger->info(ctx->cfg.logger, tag, "Try-connect-on-init flag set successfully");
 
     return DOMAIN_MODELS_ERROR_OK;
 }

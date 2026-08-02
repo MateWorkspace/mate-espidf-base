@@ -28,7 +28,6 @@ extern const ble_uuid128_t pres_ble_gatt_uuid_wifi_status_chr;
 extern const ble_uuid128_t pres_ble_gatt_uuid_wifi_connect_chr;
 extern const ble_uuid128_t pres_ble_gatt_uuid_wifi_command_chr;
 extern const ble_uuid128_t pres_ble_gatt_uuid_wifi_stored_credential_chr;
-extern const ble_uuid128_t pres_ble_gatt_uuid_wifi_try_connect_on_init_chr;
 
 /* Log service (0x0003) */
 extern const ble_uuid128_t pres_ble_gatt_uuid_log_service;

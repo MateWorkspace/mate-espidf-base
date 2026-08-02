@@ -23,7 +23,6 @@ const ble_uuid128_t pres_ble_gatt_uuid_wifi_status_chr              = PRES_BLE_G
 const ble_uuid128_t pres_ble_gatt_uuid_wifi_connect_chr             = PRES_BLE_GATT_UUID128(0x00, 0x02, 0x00, 0x02);
 const ble_uuid128_t pres_ble_gatt_uuid_wifi_command_chr             = PRES_BLE_GATT_UUID128(0x00, 0x02, 0x00, 0x03);
 const ble_uuid128_t pres_ble_gatt_uuid_wifi_stored_credential_chr   = PRES_BLE_GATT_UUID128(0x00, 0x02, 0x00, 0x04);
-const ble_uuid128_t pres_ble_gatt_uuid_wifi_try_connect_on_init_chr = PRES_BLE_GATT_UUID128(0x00, 0x02, 0x00, 0x05);
 
 /* Log service (0x0003) */
 const ble_uuid128_t pres_ble_gatt_uuid_log_service     = PRES_BLE_GATT_UUID128(0x00, 0x03, 0x00, 0x00);

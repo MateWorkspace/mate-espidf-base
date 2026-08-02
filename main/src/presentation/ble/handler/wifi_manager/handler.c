@@ -16,7 +16,7 @@
 
 /* Lifetime BLE Definitions */
 
-static struct ble_gatt_chr_def characteristic_defs[6];
+static struct ble_gatt_chr_def characteristic_defs[5];
 static struct ble_gatt_svc_def service_defs[2];
 
 /* Access Callback Function Prototypes */
@@ -25,7 +25,6 @@ static int status_access_callback(uint16_t conn_handle, uint16_t attr_handle, st
 static int connect_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int command_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 static int stored_credential_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
-static int try_connect_on_init_access_callback(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt* ctxt, void* arg);
 
 /* WiFi Status Event Prototype */
 
@@ -92,13 +91,7 @@ dom_models_error_t pres_ble_handler_wifi_manager_init(pres_ble_handler_wifi_mana
         .arg       = self,
         .flags     = BLE_GATT_CHR_F_READ,
     };
-    characteristic_defs[4] = (struct ble_gatt_chr_def){
-        .uuid      = &pres_ble_gatt_uuid_wifi_try_connect_on_init_chr.u,
-        .access_cb = try_connect_on_init_access_callback,
-        .arg       = self,
-        .flags     = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_WRITE,
-    };
-    characteristic_defs[5] = (struct ble_gatt_chr_def){0};
+    characteristic_defs[4] = (struct ble_gatt_chr_def){0};
 
     service_defs[0] = (struct ble_gatt_svc_def){
         .type            = BLE_GATT_SVC_TYPE_PRIMARY,
@@ -141,7 +134,7 @@ void pres_ble_handler_wifi_manager_deinit(pres_ble_handler_wifi_manager_t* self)
         return;
     }
 
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 4; i++) {
         characteristic_defs[i].access_cb = pres_ble_gatt_util_disabled_access_callback;
         characteristic_defs[i].arg       = NULL;
     }
@@ -305,45 +298,3 @@ static int stored_credential_access_callback(
     return pres_ble_gatt_util_write_read_response(ctxt, self->stored_credential_json, json_len);
 }
 
-static int try_connect_on_init_access_callback(
-    uint16_t                     conn_handle,
-    uint16_t                     attr_handle,
-    struct ble_gatt_access_ctxt* ctxt,
-    void*                        arg
-) {
-    (void)conn_handle;
-    (void)attr_handle;
-
-    pres_ble_handler_wifi_manager_t* self = arg;
-    if (!self || !ctxt) {
-        return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
-    }
-
-    if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
-        bool               enabled = false;
-        dom_models_error_t err     = self->cfg.wifi_manager->get_try_connect_on_init(self->cfg.wifi_manager, &enabled);
-        if (err != DOMAIN_MODELS_ERROR_OK) {
-            return BLE_ATT_ERR_UNLIKELY;
-        }
-
-        uint8_t value = enabled ? 1 : 0;
-        return pres_ble_gatt_util_write_read_response(ctxt, (const char*)&value, sizeof(value));
-    }
-
-    if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-        uint8_t value = 0;
-        if (OS_MBUF_PKTLEN(ctxt->om) < sizeof(value)) {
-            return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
-        }
-
-        int rc = ble_hs_mbuf_to_flat(ctxt->om, &value, sizeof(value), NULL);
-        if (rc != 0) {
-            return BLE_ATT_ERR_UNLIKELY;
-        }
-
-        dom_models_error_t err = self->cfg.wifi_manager->set_try_connect_on_init(self->cfg.wifi_manager, value != 0);
-        return err == DOMAIN_MODELS_ERROR_OK ? 0 : BLE_ATT_ERR_UNLIKELY;
-    }
-
-    return BLE_ATT_ERR_REQ_NOT_SUPPORTED;
-}
