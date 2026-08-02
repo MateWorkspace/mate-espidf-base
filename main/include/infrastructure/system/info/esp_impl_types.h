@@ -21,8 +21,8 @@ extern "C" {
 #endif
 #endif
 
-#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NAME             "unknown"
-#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_TYPE             "unknown"
+#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NAME             "unset"
+#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_TYPE             "unset"
 #define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_FIRMWARE_VERSION INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_PROJECT_VERSION
 
 typedef struct {
