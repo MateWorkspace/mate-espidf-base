@@ -13,6 +13,7 @@ extern "C" {
 #define INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN 37
 #define INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN       96
 #define INF_MESSAGING_DEF_PUB_STUB_IMPL_LOG_MAX_LEN       256
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_PAYLOAD_MAX_LEN   256
 
 typedef struct {
     bool connected;
@@ -36,10 +37,16 @@ typedef struct {
     char                       last_action_ack_execution_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_action_ack_status[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_action_ack_message[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_telemetry_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
+    char                       last_telemetry_metric_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_telemetry_payload_schema_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    int                        last_telemetry_payload_schema_version;
+    char                       last_telemetry_payload_json[INF_MESSAGING_DEF_PUB_STUB_IMPL_PAYLOAD_MAX_LEN];
     size_t                     registration_publish_cnt;
     size_t                     status_publish_cnt;
     size_t                     log_publish_cnt;
     size_t                     action_ack_publish_cnt;
+    size_t                     telemetry_publish_cnt;
 } inf_messaging_def_pub_stub_impl_ctx_t;
 
 #ifdef __cplusplus

@@ -137,6 +137,42 @@ char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
     return json;
 }
 
+char* inf_messaging_def_pub_mqtt_impl_build_telemetry_json(
+    const char* metric_name,
+    const char* payload_schema_name,
+    int         payload_schema_version,
+    const char* payload_json
+) {
+    if (!cstr_available(metric_name) || !cstr_available(payload_schema_name) || !cstr_available(payload_json)) {
+        return NULL;
+    }
+
+    cJSON* payload = cJSON_Parse(payload_json);
+    if (!payload) {
+        return NULL;
+    }
+
+    cJSON* root = cJSON_CreateObject();
+    if (!root) {
+        cJSON_Delete(payload);
+        return NULL;
+    }
+
+    if (!cJSON_AddStringToObject(root, "metric_name", metric_name) ||
+        !cJSON_AddStringToObject(root, "payload_schema_name", payload_schema_name) ||
+        !cJSON_AddNumberToObject(root, "payload_schema_version", payload_schema_version) ||
+        !cJSON_AddItemToObject(root, "payload", payload)) {
+        cJSON_Delete(root);
+        cJSON_Delete(payload);
+        return NULL;
+    }
+
+    char* json = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    return json;
+}
+
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
     const char*                                  topic,

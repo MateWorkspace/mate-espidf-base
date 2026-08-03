@@ -45,6 +45,15 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_action_ack(
     const char*                            message
 );
 
+dom_models_error_t inf_messaging_def_pub_stub_impl_set_telemetry(
+    inf_messaging_def_pub_stub_impl_ctx_t* ctx,
+    const char*                            device_id,
+    const char*                            metric_name,
+    const char*                            payload_schema_name,
+    int                                     payload_schema_version,
+    const char*                            payload_json
+);
+
 #ifdef __cplusplus
 }
 #endif

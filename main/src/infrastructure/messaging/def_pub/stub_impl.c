@@ -39,6 +39,14 @@ static dom_models_error_t action_ack_impl(
     const char*                        status,
     const char*                        message
 );
+static dom_models_error_t telemetry_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        metric_name,
+    const char*                        payload_schema_name,
+    int                                payload_schema_version,
+    const char*                        payload_json
+);
 
 /* Constructor and Destructor */
 
@@ -68,6 +76,7 @@ dom_contracts_messaging_def_pub_t* inf_messaging_def_pub_stub_impl_new(
     self->status       = status_impl;
     self->log          = log_impl;
     self->action_ack   = action_ack_impl;
+    self->telemetry    = telemetry_impl;
 
     return self;
 }
@@ -152,4 +161,19 @@ static dom_models_error_t action_ack_impl(
     }
 
     return inf_messaging_def_pub_stub_impl_set_action_ack(self->ctx, device_id, execution_id, status, message);
+}
+
+static dom_models_error_t telemetry_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        metric_name,
+    const char*                        payload_schema_name,
+    int                                payload_schema_version,
+    const char*                        payload_json
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return inf_messaging_def_pub_stub_impl_set_telemetry(self->ctx, device_id, metric_name, payload_schema_name, payload_schema_version, payload_json);
 }

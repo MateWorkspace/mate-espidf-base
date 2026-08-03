@@ -101,6 +101,28 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_action_ack(
     return DOMAIN_MODELS_ERROR_OK;
 }
 
+dom_models_error_t inf_messaging_def_pub_stub_impl_set_telemetry(
+    inf_messaging_def_pub_stub_impl_ctx_t* ctx,
+    const char*                            device_id,
+    const char*                            metric_name,
+    const char*                            payload_schema_name,
+    int                                     payload_schema_version,
+    const char*                            payload_json
+) {
+    if (!ctx || !cstr_available(device_id) || !cstr_available(metric_name) || !cstr_available(payload_schema_name) || !cstr_available(payload_json)) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    copy_cstr(ctx->last_telemetry_device_id, sizeof(ctx->last_telemetry_device_id), device_id);
+    copy_cstr(ctx->last_telemetry_metric_name, sizeof(ctx->last_telemetry_metric_name), metric_name);
+    copy_cstr(ctx->last_telemetry_payload_schema_name, sizeof(ctx->last_telemetry_payload_schema_name), payload_schema_name);
+    ctx->last_telemetry_payload_schema_version = payload_schema_version;
+    copy_cstr(ctx->last_telemetry_payload_json, sizeof(ctx->last_telemetry_payload_json), payload_json);
+    ctx->telemetry_publish_cnt++;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
 /* Helper Function Implementations */
 
 static bool cstr_available(const char* value) {

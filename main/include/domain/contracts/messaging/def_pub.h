@@ -47,6 +47,14 @@ struct dom_contracts_messaging_def_pub_t {
         const char*                        status,
         const char*                        message
     );
+    dom_models_error_t (*telemetry)(
+        dom_contracts_messaging_def_pub_t* self,
+        const char*                        device_id,
+        const char*                        metric_name,
+        const char*                        payload_schema_name,
+        int                                payload_schema_version,
+        const char*                        payload_json
+    );
 };
 
 static inline dom_contracts_messaging_def_pub_t* dom_contracts_messaging_def_pub_new(void* ctx) {

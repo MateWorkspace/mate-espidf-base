@@ -44,6 +44,13 @@ char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
     const char* message
 );
 
+char* inf_messaging_def_pub_mqtt_impl_build_telemetry_json(
+    const char* metric_name,
+    const char* payload_schema_name,
+    int         payload_schema_version,
+    const char* payload_json
+);
+
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const inf_messaging_def_pub_mqtt_impl_ctx_t* ctx,
     const char*                                  topic,
