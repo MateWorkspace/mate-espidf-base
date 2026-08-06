@@ -7,5 +7,4 @@ void app_main(void) {
     // cmp_test_seed_run();
     // cmp_counter_test_launcher();
     cmp_main_launcher();
-#endif
 }
