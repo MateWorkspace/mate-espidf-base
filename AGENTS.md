@@ -192,6 +192,16 @@ leading slash and exact suffixes because the backend subscriptions use the
 same contract. Device IDs are derived from the MAC and formatted as the
 stable uppercase hexadecimal string used throughout the project.
 
+`/sub/<device_id>/registration_ack`'s payload is `{"success": bool}` (see
+`presentation/mqtt/handler/registration_ack/`, folder-per-handler with a
+DTO like `action`/`config`/`ota`). `success:true` logs and proceeds
+normally. Every failure mode — `success:false`, a missing `success` field,
+or an unparseable payload — logs an error and calls
+`ctx->messaging_callbacks->restart(ctx->messaging_callbacks, 0)` (delay 0 =
+immediate `esp_restart()`), not just an explicit `false`. Keep this in sync
+with the backend's `messaging_callback` usecase — see the root
+`mate-things/AGENTS.md`'s cross-layer fleet contracts.
+
 ### Dynamic configuration
 
 `DOMAIN_MODELS_PRELOADED_SCHEMA` in
