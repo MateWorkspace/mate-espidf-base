@@ -1,7 +1,6 @@
 // #include "composition/counter_test/launcher.h"
 #include "composition/main/launcher.h"
 // #include "composition/test_seed/seed.h"
-#include "sdkconfig.h"
 
 void app_main(void) {
     // cmp_test_seed_run();
