@@ -28,6 +28,7 @@ typedef struct {
     bool                       connected;
     char                       last_registration_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     char                       last_registration_device_info[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_registration_node_class_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_registration_firmware_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_status_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     dom_models_device_status_t last_status;

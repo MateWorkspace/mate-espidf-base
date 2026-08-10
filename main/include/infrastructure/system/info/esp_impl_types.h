@@ -21,6 +21,14 @@ extern "C" {
 #endif
 #endif
 
+#ifndef INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NODE_CLASS_NAME
+#ifdef NODE_CLASS_NAME
+#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NODE_CLASS_NAME NODE_CLASS_NAME
+#else
+#define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NODE_CLASS_NAME "base_node"
+#endif
+#endif
+
 #define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NAME             "unset"
 #define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_TYPE             "unset"
 #define INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_FIRMWARE_VERSION INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_PROJECT_VERSION
@@ -31,6 +39,7 @@ typedef struct {
     const char* name;
     const char* type;
     const char* firmware_version;
+    const char* node_class_name;
 } inf_system_info_esp_impl_cfg_t;
 
 #define INF_SYSTEM_INFO_ESP_IMPL_CFG_DEFAULT()                                 \
@@ -40,6 +49,7 @@ typedef struct {
         .name             = INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NAME,             \
         .type             = INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_TYPE,             \
         .firmware_version = INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_FIRMWARE_VERSION, \
+        .node_class_name  = INF_SYSTEM_INFO_ESP_IMPL_DEFAULT_NODE_CLASS_NAME,  \
     }
 
 typedef struct {

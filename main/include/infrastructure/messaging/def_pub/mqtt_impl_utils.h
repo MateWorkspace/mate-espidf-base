@@ -27,11 +27,12 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_build_device_topic(
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
-    const char*                       device_id,
-    const char*                       device_info,
-    const char*                       firmware_name,
-    const dom_models_preloaded_kv_t*  config,
-    size_t                            config_count
+    const char*                      device_id,
+    const char*                      device_info,
+    const char*                      node_class_name,
+    const char*                      firmware_name,
+    const dom_models_preloaded_kv_t* config,
+    size_t                           config_count
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_status_json(
@@ -56,7 +57,7 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const char*                                  topic,
     char*                                        json,
     int                                          qos,
-    bool                                          retain
+    bool                                         retain
 );
 
 dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_raw(

@@ -31,14 +31,16 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_registration(
     inf_messaging_def_pub_stub_impl_ctx_t* ctx,
     const char*                            device_id,
     const char*                            device_info,
+    const char*                            node_class_name,
     const char*                            firmware_name
 ) {
-    if (!ctx || !cstr_available(device_id) || !cstr_available(device_info) || !cstr_available(firmware_name)) {
+    if (!ctx || !cstr_available(device_id) || !cstr_available(device_info) || !cstr_available(node_class_name) || !cstr_available(firmware_name)) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
     copy_cstr(ctx->last_registration_device_id, sizeof(ctx->last_registration_device_id), device_id);
     copy_cstr(ctx->last_registration_device_info, sizeof(ctx->last_registration_device_info), device_info);
+    copy_cstr(ctx->last_registration_node_class_name, sizeof(ctx->last_registration_node_class_name), node_class_name);
     copy_cstr(ctx->last_registration_firmware_name, sizeof(ctx->last_registration_firmware_name), firmware_name);
     ctx->registration_publish_cnt++;
 
@@ -106,7 +108,7 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_telemetry(
     const char*                            device_id,
     const char*                            metric_name,
     const char*                            payload_schema_name,
-    int                                     payload_schema_version,
+    int                                    payload_schema_version,
     const char*                            payload_json
 ) {
     if (!ctx || !cstr_available(device_id) || !cstr_available(metric_name) || !cstr_available(payload_schema_name) || !cstr_available(payload_json)) {

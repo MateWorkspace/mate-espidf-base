@@ -21,6 +21,7 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_registration(
     inf_messaging_def_pub_stub_impl_ctx_t* ctx,
     const char*                            device_id,
     const char*                            device_info,
+    const char*                            node_class_name,
     const char*                            firmware_name
 );
 
@@ -50,7 +51,7 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_telemetry(
     const char*                            device_id,
     const char*                            metric_name,
     const char*                            payload_schema_name,
-    int                                     payload_schema_version,
+    int                                    payload_schema_version,
     const char*                            payload_json
 );
 

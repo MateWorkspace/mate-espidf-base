@@ -25,6 +25,7 @@ struct dom_contracts_messaging_def_pub_t {
         dom_contracts_messaging_def_pub_t* self,
         const char*                        device_id,
         const char*                        device_info,
+        const char*                        node_class_name,
         const char*                        firmware_name,
         const dom_models_preloaded_kv_t*   config,
         size_t                             config_count

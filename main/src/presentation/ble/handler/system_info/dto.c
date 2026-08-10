@@ -28,6 +28,7 @@ size_t pres_ble_handler_system_info_dto_encode_info(
         cJSON_AddStringToObject(project_obj, "name", project->name);
         cJSON_AddStringToObject(project_obj, "type", project->type);
         cJSON_AddStringToObject(project_obj, "firmware_version", project->firmware_version);
+        cJSON_AddStringToObject(project_obj, "node_class_name", project->node_class_name);
     }
 
     cJSON* chip_obj = cJSON_AddObjectToObject(root, "chip");

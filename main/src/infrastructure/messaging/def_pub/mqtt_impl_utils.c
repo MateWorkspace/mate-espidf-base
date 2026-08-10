@@ -42,11 +42,12 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_build_device_topic(
 char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
     const char*                      device_id,
     const char*                      device_info,
+    const char*                      node_class_name,
     const char*                      firmware_name,
     const dom_models_preloaded_kv_t* config,
     size_t                           config_count
 ) {
-    if (!cstr_available(device_id) || !cstr_available(device_info) || !cstr_available(firmware_name)) {
+    if (!cstr_available(device_id) || !cstr_available(device_info) || !cstr_available(node_class_name) || !cstr_available(firmware_name)) {
         return NULL;
     }
 
@@ -57,6 +58,7 @@ char* inf_messaging_def_pub_mqtt_impl_build_registration_json(
 
     if (!cJSON_AddStringToObject(root, "device_id", device_id) ||
         !cJSON_AddStringToObject(root, "device_info", device_info) ||
+        !cJSON_AddStringToObject(root, "node_class_name", node_class_name) ||
         !cJSON_AddStringToObject(root, "firmware_name", firmware_name)) {
         cJSON_Delete(root);
         return NULL;
@@ -178,7 +180,7 @@ dom_models_error_t inf_messaging_def_pub_mqtt_impl_publish_json(
     const char*                                  topic,
     char*                                        json,
     int                                          qos,
-    bool                                          retain
+    bool                                         retain
 ) {
     if (!ctx || !ctx->cfg.mqtt_client || !cstr_available(topic)) {
         if (json) {

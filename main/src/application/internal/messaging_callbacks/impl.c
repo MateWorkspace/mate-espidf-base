@@ -269,7 +269,7 @@ static dom_models_error_t publish_registration_impl(
         {DOMAIN_MODELS_PRELOADED_WIFI_STA_TRY_CONNECT_ON_INIT_KEY, wifi_try_init ? "true" : "false"},
     };
 
-    err = ctx->cfg.def_pub->registration(ctx->cfg.def_pub, device_id_str, device_info, firmware_name, config, sizeof(config) / sizeof(config[0]));
+    err = ctx->cfg.def_pub->registration(ctx->cfg.def_pub, device_id_str, device_info, project_info.node_class_name, firmware_name, config, sizeof(config) / sizeof(config[0]));
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Failed to publish registration: %s (%d)", dom_models_error_str(err), (int)err);
         return err;

@@ -46,6 +46,9 @@ dom_contracts_system_info_t* inf_system_info_esp_impl_new(const inf_system_info_
     if (!ctx->cfg.firmware_version) {
         ctx->cfg.firmware_version = default_cfg.firmware_version;
     }
+    if (!ctx->cfg.node_class_name) {
+        ctx->cfg.node_class_name = default_cfg.node_class_name;
+    }
 
     dom_contracts_system_info_t* self = dom_contracts_system_info_new(ctx);
     if (!self) {
@@ -87,6 +90,7 @@ static dom_models_error_t get_project_info_impl(
     inf_system_info_esp_impl_copy_cstr(out->name, sizeof(out->name), ctx->cfg.name);
     inf_system_info_esp_impl_copy_cstr(out->type, sizeof(out->type), ctx->cfg.type);
     inf_system_info_esp_impl_copy_cstr(out->firmware_version, sizeof(out->firmware_version), ctx->cfg.firmware_version);
+    inf_system_info_esp_impl_copy_cstr(out->node_class_name, sizeof(out->node_class_name), ctx->cfg.node_class_name);
 
     return DOMAIN_MODELS_ERROR_OK;
 }

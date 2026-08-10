@@ -18,6 +18,7 @@ static dom_models_error_t registration_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
     const char*                        device_info,
+    const char*                        node_class_name,
     const char*                        firmware_name,
     const dom_models_preloaded_kv_t*   config,
     size_t                             config_count
@@ -159,11 +160,12 @@ static dom_models_error_t registration_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
     const char*                        device_info,
+    const char*                        node_class_name,
     const char*                        firmware_name,
     const dom_models_preloaded_kv_t*   config,
     size_t                             config_count
 ) {
-    if (!self || !self->ctx || !device_id || device_id[0] == '\0' || !device_info || device_info[0] == '\0' || !firmware_name || firmware_name[0] == '\0') {
+    if (!self || !self->ctx || !device_id || device_id[0] == '\0' || !device_info || device_info[0] == '\0' || !node_class_name || node_class_name[0] == '\0' || !firmware_name || firmware_name[0] == '\0') {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
@@ -172,7 +174,7 @@ static dom_models_error_t registration_impl(
     return inf_messaging_def_pub_mqtt_impl_publish_json(
         ctx,
         "/pub/registration",
-        inf_messaging_def_pub_mqtt_impl_build_registration_json(device_id, device_info, firmware_name, config, config_count),
+        inf_messaging_def_pub_mqtt_impl_build_registration_json(device_id, device_info, node_class_name, firmware_name, config, config_count),
         INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
         false
     );

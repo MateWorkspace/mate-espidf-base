@@ -11,6 +11,7 @@ typedef struct {
     char name[64];
     char type[32];
     char firmware_version[48];
+    char node_class_name[64];
 } dom_models_system_project_info_t;
 
 typedef struct {
