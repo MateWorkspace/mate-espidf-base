@@ -67,8 +67,6 @@ void inf_device_ir_esp_impl_delete(dom_contracts_device_ir_t* self) {
 /* Lifecycle */
 
 dom_models_error_t inf_device_ir_esp_impl_init(dom_contracts_device_ir_t* self) {
-    const char* tag = BASE_TAG "/init";
-
     if (!self || !self->ctx) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
