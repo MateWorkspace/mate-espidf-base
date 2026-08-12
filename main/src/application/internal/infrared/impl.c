@@ -149,14 +149,17 @@ static dom_models_error_t transmit_impl(
 ) {
     const char* tag = BASE_TAG "/transmit";
 
-    if (!self || !self->ctx || !execution_id || execution_id[0] == '\0' || !raw_data || raw_data_count == 0) {
-        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
-    }
-    if (raw_data_count > IR_RAW_DATA_MAX_LEN) {
+    if (!self || !self->ctx || !execution_id || execution_id[0] == '\0') {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
     app_internal_infrared_impl_ctx_t* ctx = self->ctx;
+
+    if (!raw_data || raw_data_count == 0 || raw_data_count > IR_RAW_DATA_MAX_LEN) {
+        ctx->cfg.logger->error(ctx->cfg.logger, tag, "Invalid raw_data payload");
+        (void)ctx->cfg.def_pub->ir_transmit_ack(ctx->cfg.def_pub, ctx->device_id_str, execution_id, IR_TRANSMIT_ACK_FAILED, "invalid raw_data payload");
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
 
     dom_models_ir_duration_t durations[IR_RAW_DATA_MAX_LEN];
     dom_models_error_t       err = app_internal_infrared_impl_raw_data_to_durations(raw_data, raw_data_count, durations);
