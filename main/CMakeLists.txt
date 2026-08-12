@@ -34,6 +34,7 @@ idf_component_register(
         mbedtls
         mqtt
         # components
+        infrared
         # idf components
         cjson
         littlefs
