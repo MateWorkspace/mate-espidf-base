@@ -14,9 +14,11 @@ pres_mqtt_context_t* pres_mqtt_context_new(
     dom_contracts_repository_preloaded_t*        preloaded_repository,
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks,
     dom_usecases_internal_settings_t*            settings,
-    dom_usecases_internal_ota_t*                 ota
+    dom_usecases_internal_ota_t*                 ota,
+    dom_contracts_messaging_def_pub_t*           def_pub,
+    dom_usecases_internal_infrared_t*            infrared
 ) {
-    if (pres_mqtt_context_validate_cfg(logger, preloaded_repository, messaging_callbacks, settings, ota) != DOMAIN_MODELS_ERROR_OK) {
+    if (pres_mqtt_context_validate_cfg(logger, preloaded_repository, messaging_callbacks, settings, ota, def_pub) != DOMAIN_MODELS_ERROR_OK) {
         return NULL;
     }
 
@@ -30,6 +32,8 @@ pres_mqtt_context_t* pres_mqtt_context_new(
     self->messaging_callbacks  = messaging_callbacks;
     self->settings             = settings;
     self->ota                  = ota;
+    self->def_pub              = def_pub;
+    self->infrared             = infrared;
     self->mqtt_client          = NULL;
 
     dom_models_error_t err = preloaded_repository->get_device_id_str(
@@ -91,6 +95,12 @@ dom_models_error_t pres_mqtt_context_init(pres_mqtt_context_t* self, esp_mqtt_cl
     written = snprintf(self->config_topic, sizeof(self->config_topic), "/sub/%s/config", self->device_id_str);
     if (written <= 0 || (size_t)written >= sizeof(self->config_topic)) {
         self->logger->error(self->logger, tag, "Failed to build config topic string");
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    written = snprintf(self->ir_tx_topic, sizeof(self->ir_tx_topic), "/sub/%s/ir/tx", self->device_id_str);
+    if (written <= 0 || (size_t)written >= sizeof(self->ir_tx_topic)) {
+        self->logger->error(self->logger, tag, "Failed to build ir_tx topic string");
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 

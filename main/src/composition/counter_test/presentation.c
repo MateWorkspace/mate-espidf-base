@@ -22,7 +22,9 @@ dom_models_error_t cmp_counter_test_presentation_init(cmp_counter_test_launcher_
         launcher->infrastructure.preloaded_repository,
         launcher->application.messaging_callbacks,
         launcher->application.settings,
-        launcher->application.ota
+        launcher->application.ota,
+        launcher->infrastructure.def_pub,
+        NULL
     );
     if (!launcher->presentation.mqtt_context) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;

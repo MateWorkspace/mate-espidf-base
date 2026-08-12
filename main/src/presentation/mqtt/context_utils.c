@@ -5,9 +5,10 @@ dom_models_error_t pres_mqtt_context_validate_cfg(
     dom_contracts_repository_preloaded_t*        preloaded_repository,
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks,
     dom_usecases_internal_settings_t*            settings,
-    dom_usecases_internal_ota_t*                 ota
+    dom_usecases_internal_ota_t*                 ota,
+    dom_contracts_messaging_def_pub_t*           def_pub
 ) {
-    if (!logger || !preloaded_repository || !messaging_callbacks || !settings || !ota) {
+    if (!logger || !preloaded_repository || !messaging_callbacks || !settings || !ota || !def_pub) {
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 

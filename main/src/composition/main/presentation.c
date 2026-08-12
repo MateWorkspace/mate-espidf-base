@@ -22,7 +22,10 @@ dom_models_error_t cmp_main_presentation_init(cmp_main_launcher_t* launcher) {
         launcher->infrastructure.preloaded_repository,
         launcher->application.messaging_callbacks,
         launcher->application.settings,
-        launcher->application.ota
+        launcher->application.ota,
+        launcher->infrastructure.def_pub,
+        NULL /* infrared: composition/main never wires IR, so it never
+                subscribes to ir/tx either - see Task 6 */
     );
     if (!launcher->presentation.mqtt_context) {
         return DOMAIN_MODELS_ERROR_MALLOC_FAILED;

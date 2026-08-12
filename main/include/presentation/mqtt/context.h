@@ -4,7 +4,9 @@
 #include <stdbool.h>
 
 #include "domain/contracts/logger/leveled.h"
+#include "domain/contracts/messaging/def_pub.h"
 #include "domain/contracts/repository/preloaded.h"
+#include "domain/usecases/internal/infrared.h"
 #include "domain/usecases/internal/messaging_callbacks.h"
 #include "domain/usecases/internal/ota.h"
 #include "domain/usecases/internal/settings.h"
@@ -22,9 +24,13 @@ typedef struct {
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks;
     dom_usecases_internal_ota_t*                 ota;
     dom_usecases_internal_settings_t*            settings;
-    esp_mqtt_client_handle_t                     mqtt_client;
-    char                                         device_id_str[37];
-    bool                                         registered;
+    dom_contracts_messaging_def_pub_t*           def_pub;
+    dom_usecases_internal_infrared_t*            infrared; /* nullable: NULL on
+                                                                compositions that
+                                                                don't wire IR */
+    esp_mqtt_client_handle_t mqtt_client;
+    char                     device_id_str[37];
+    bool                     registered;
     /* Struct-owned (not stack-local in on_message.c's callback, which runs
        on esp-mqtt's internal event task) - same rationale as
        presentation/ble/handler/settings/types.h's comment: a stack-local
@@ -33,11 +39,12 @@ typedef struct {
        bugs #6/#7); this fixes the one remaining presentation handler that
        still had the same pattern before it had a chance to crash the
        same way. */
-    char                                         topic_scratch[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
-    char                                         registration_ack_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
-    char                                         ota_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
-    char                                         action_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
-    char                                         config_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char topic_scratch[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char registration_ack_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char ota_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char action_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char config_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    char ir_tx_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
 } pres_mqtt_context_t;
 
 pres_mqtt_context_t* pres_mqtt_context_new(
@@ -45,7 +52,9 @@ pres_mqtt_context_t* pres_mqtt_context_new(
     dom_contracts_repository_preloaded_t*        preloaded_repository,
     dom_usecases_internal_messaging_callbacks_t* messaging_callbacks,
     dom_usecases_internal_settings_t*            settings,
-    dom_usecases_internal_ota_t*                 ota
+    dom_usecases_internal_ota_t*                 ota,
+    dom_contracts_messaging_def_pub_t*           def_pub,
+    dom_usecases_internal_infrared_t*            infrared
 );
 
 void pres_mqtt_context_delete(pres_mqtt_context_t* self);
