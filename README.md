@@ -81,3 +81,26 @@ with that name already exists, so re-running it after every rebuild just
 updates the same entry. It prints the firmware's id, size, checksum, and a
 freshly issued presigned download URL, ready to use in an OTA dispatch
 request (`POST /v1/nodes/by-device/{device_id}/ota`).
+
+## VSCode setup
+
+### Clangd
+
+1. Install the `clangd` extension.
+2. Go to `Settings` > `Clangd: Arguments` and add:
+   - Linux:
+     ```text
+     --query-driver=**/xtensa-esp-elf/**/bin/xtensa-esp*-elf-gcc,**/xtensa-esp-elf/**/bin/xtensa-esp*-elf-g++,**/riscv32-esp-elf/**/bin/riscv32-esp-elf-gcc,**/riscv32-esp-elf/**/bin/riscv32-esp-elf-g++
+     ```
+   - Windows:
+     ```text
+     --query-driver=C:/Espressif/tools/xtensa-esp-elf/*/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc.exe,C:/Espressif/tools/xtensa-esp-elf/*/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc.exe,C:/Espressif/tools/riscv32-esp-elf/*/riscv32-esp-elf/bin/riscv32-esp-elf-gcc.exe
+     ```
+3. After opening a `.c` or `.h` file, you may be prompted to install `clangd` on your machine — accept it.
+4. Right-click a `.c` or `.h` file and go to `Format Document With...` > `Configure Default Formatter...` > `clangd`.
+5. Go to `Settings` > `Editor: Format On Save` and enable it, so files are formatted automatically on save.
+
+### ESP-IDF extension
+
+Install the `ESP-IDF` extension — it helps a lot if you're not comfortable
+working from the command line.
