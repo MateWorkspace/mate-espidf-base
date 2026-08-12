@@ -126,8 +126,6 @@ esp_err_t infrared_tx_init(infrared_handle_t* self) {
         .flags             = {
             .invert_out   = false,
             .with_dma     = false,
-            .io_loop_back = false,
-            .io_od_mode   = false,
             .allow_pd     = false,
             .init_level   = false,
         },

@@ -5,8 +5,9 @@ idf_component_register(
         ${srcsc}
     INCLUDE_DIRS 
         "include"
-    REQUIRES 
+    REQUIRES
         driver
+        esp_driver_gpio
         esp_driver_rmt
         esp_timer
         freertos
