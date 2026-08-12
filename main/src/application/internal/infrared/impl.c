@@ -10,7 +10,7 @@
 #define BASE_TAG                "app_internal_infrared"
 #define IR_TRANSMIT_ACK_SUCCESS "SUCCESS"
 #define IR_TRANSMIT_ACK_FAILED  "FAILED"
-#define IR_RAW_DATA_MAX_LEN     512 /* matches INFRARED_RX_MAX_DURATIONS */
+#define IR_RAW_DATA_MAX_LEN     APP_INTERNAL_INFRARED_IMPL_RAW_DATA_MAX_LEN
 
 /* Contract Function Prototypes */
 
@@ -161,8 +161,8 @@ static dom_models_error_t transmit_impl(
         return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
     }
 
-    dom_models_ir_duration_t durations[IR_RAW_DATA_MAX_LEN];
-    dom_models_error_t       err = app_internal_infrared_impl_raw_data_to_durations(raw_data, raw_data_count, durations);
+    dom_models_ir_duration_t* durations = ctx->transmit_durations_scratch;
+    dom_models_error_t        err       = app_internal_infrared_impl_raw_data_to_durations(raw_data, raw_data_count, durations);
     if (err != DOMAIN_MODELS_ERROR_OK) {
         ctx->cfg.logger->error(ctx->cfg.logger, tag, "Invalid raw_data payload: %s (%d)", dom_models_error_str(err), (int)err);
         (void)ctx->cfg.def_pub->ir_transmit_ack(ctx->cfg.def_pub, ctx->device_id_str, execution_id, IR_TRANSMIT_ACK_FAILED, "invalid raw_data payload");
@@ -199,7 +199,7 @@ static void on_ir_receive(
         return;
     }
 
-    int32_t raw_data[IR_RAW_DATA_MAX_LEN];
+    int32_t* raw_data = ctx->receive_raw_data_scratch;
     if (app_internal_infrared_impl_durations_to_raw_data(durations, duration_count, raw_data) != DOMAIN_MODELS_ERROR_OK) {
         return;
     }

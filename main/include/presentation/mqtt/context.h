@@ -11,6 +11,7 @@
 #include "domain/usecases/internal/ota.h"
 #include "domain/usecases/internal/settings.h"
 #include "mqtt_client.h"
+#include "presentation/mqtt/handler/ir_tx/dto.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +46,11 @@ typedef struct {
     char action_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
     char config_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
     char ir_tx_topic[PRES_MQTT_CONTEXT_TOPIC_MAX_LEN];
+    /* Struct-owned for the same reason as topic_scratch above: the decoded
+       ir/tx DTO is large enough (~2.1KB) that combined with transmit_impl's
+       own scratch buffer it risks overflowing the esp-mqtt task stack if
+       kept stack-local in the handler. */
+    pres_mqtt_handler_ir_tx_dto_request_t ir_tx_request_scratch;
 } pres_mqtt_context_t;
 
 pres_mqtt_context_t* pres_mqtt_context_new(
