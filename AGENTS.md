@@ -79,6 +79,14 @@ presentation → application → domain ← infrastructure
   order and deinitialize in reverse order through `launcher.c`.
 - **`composition/test_seed/`** — alternate boot composition that writes
   controlled NVS values for hardware testing.
+- **`composition/infrared/`** — alternate boot composition, a full
+  duplicate of `composition/main/` with `infrastructure/device/ir` and
+  `application/internal/infrared` additionally wired in. The only
+  composition that subscribes to `ir/tx`. Selected the same way as
+  `composition/counter_test/` — by editing the include/call in
+  `main/main.c` — not by Kconfig. `composition/main` is the default active
+  launcher; `composition/infrared` ships commented out until a build is
+  explicitly targeting IR-capable hardware.
 
 `main/main.c` selects the normal launcher unless
 `CONFIG_MATE_TEST_SEED_NVS_ON_BOOT` is enabled.
@@ -186,6 +194,10 @@ hand-code byte-reversed UUID literals inside individual handlers.
   - `/sub/<device_id>/action`
   - `/sub/<device_id>/ota`
   - `/sub/<device_id>/config`
+  - `/sub/<device_id>/ir/tx` (only subscribed by the `composition/infrared`
+    build variant)
+- Publish IR captures on `/pub/<device_id>/ir/rx` and transmit results on
+  `/pub/<device_id>/ir/tx_ack`, both only from `composition/infrared`.
 
 Build topic strings through existing messaging/context helpers; preserve the
 leading slash and exact suffixes because the backend subscriptions use the
