@@ -31,9 +31,15 @@ dom_models_error_t pres_mqtt_handler_ir_tx_dto_decode(
     if (cJSON_IsArray(raw_data_item)) {
         int    array_size = cJSON_GetArraySize(raw_data_item);
         size_t count      = 0;
+
+        if (array_size > PRES_MQTT_HANDLER_IR_TX_DTO_RAW_DATA_MAX_LEN) {
+            out->raw_data_lossy = true;
+        }
+
         for (int i = 0; i < array_size && count < PRES_MQTT_HANDLER_IR_TX_DTO_RAW_DATA_MAX_LEN; i++) {
             cJSON* item = cJSON_GetArrayItem(raw_data_item, i);
             if (!cJSON_IsNumber(item)) {
+                out->raw_data_lossy = true;
                 continue;
             }
             out->raw_data[count] = (int32_t)item->valuedouble;

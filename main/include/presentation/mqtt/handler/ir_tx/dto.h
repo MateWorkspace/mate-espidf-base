@@ -19,6 +19,13 @@ typedef struct {
     bool    execution_id_set;
     int32_t raw_data[PRES_MQTT_HANDLER_IR_TX_DTO_RAW_DATA_MAX_LEN];
     size_t  raw_data_count;
+    /* True if raw_data was truncated (array_size exceeds the max length
+       above) or contained a non-numeric element - either case means
+       raw_data no longer reflects the payload verbatim, which would
+       silently corrupt mark/space parity if used as-is. Callers must
+       treat this as a hard decode failure, not fall back to the
+       partially-decoded raw_data. */
+    bool raw_data_lossy;
 } pres_mqtt_handler_ir_tx_dto_request_t;
 
 /* Parses the /sub/<device_id>/ir/tx payload:
