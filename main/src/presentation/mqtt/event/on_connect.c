@@ -15,4 +15,15 @@ void pres_mqtt_event_on_connect(pres_mqtt_context_t* ctx, esp_mqtt_event_handle_
     (void)ctx->messaging_callbacks->publish_registration(ctx->messaging_callbacks);
     (void)ctx->messaging_callbacks->publish_online_status(ctx->messaging_callbacks);
     (void)ctx->messaging_callbacks->subscribe_defaults(ctx->messaging_callbacks);
+
+    /* Nullable: only compositions that wire IR (e.g. composition/infrared)
+       set this. Same "log and continue" convention as subscribe_defaults
+       above - a failed resubscribe here isn't fatal, it retries on the
+       next reconnect. */
+    if (ctx->infrared) {
+        dom_models_error_t err = ctx->infrared->subscribe(ctx->infrared);
+        if (err != DOMAIN_MODELS_ERROR_OK) {
+            ctx->logger->error(ctx->logger, tag, "Failed to subscribe to ir/tx: %s (%d)", dom_models_error_str(err), (int)err);
+        }
+    }
 }

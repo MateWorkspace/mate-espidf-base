@@ -35,10 +35,9 @@ dom_models_error_t cmp_infrared_presentation_init(cmp_infrared_launcher_t* launc
         return err;
     }
 
-    err = launcher->application.infrared->subscribe(launcher->application.infrared);
-    if (err != DOMAIN_MODELS_ERROR_OK) {
-        return err;
-    }
+    /* ir/tx subscription is issued from pres_mqtt_event_on_connect (fires on
+       every MQTT_EVENT_CONNECTED, including reconnects) instead of here -
+       subscribing synchronously at boot races the async MQTT connect. */
 
     pres_task_wifi_sta_reconnect_cfg_t reconnect_task_cfg = {
         .wifi_manager = launcher->application.wifi_manager,
