@@ -4,4 +4,4 @@ managed_components/
 sdkconfig*
 !sdkconfig.defaults.superpowers/
 .todo
-upload.config.json
+upload.config.json.worktrees/
