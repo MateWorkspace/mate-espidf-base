@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "domain/models/device_status.h"
 #include "domain/models/error.h"
@@ -40,6 +41,17 @@ char* inf_messaging_def_pub_mqtt_impl_build_status_json(
 );
 
 char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
+    const char* execution_id,
+    const char* status,
+    const char* message
+);
+
+char* inf_messaging_def_pub_mqtt_impl_build_ir_capture_json(
+    const int32_t* raw_data,
+    size_t         raw_data_count
+);
+
+char* inf_messaging_def_pub_mqtt_impl_build_ir_transmit_ack_json(
     const char* execution_id,
     const char* status,
     const char* message

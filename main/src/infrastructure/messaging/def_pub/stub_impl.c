@@ -1,5 +1,6 @@
 #include "infrastructure/messaging/def_pub/stub_impl.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "domain/contracts/messaging/def_pub.h"
@@ -40,6 +41,19 @@ static dom_models_error_t action_ack_impl(
     const char*                        status,
     const char*                        message
 );
+static dom_models_error_t ir_capture_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const int32_t*                     raw_data,
+    size_t                             raw_data_count
+);
+static dom_models_error_t ir_transmit_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
+);
 static dom_models_error_t telemetry_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
@@ -72,12 +86,14 @@ dom_contracts_messaging_def_pub_t* inf_messaging_def_pub_stub_impl_new(
         return NULL;
     }
 
-    self->is_connected = is_connected_impl;
-    self->registration = registration_impl;
-    self->status       = status_impl;
-    self->log          = log_impl;
-    self->action_ack   = action_ack_impl;
-    self->telemetry    = telemetry_impl;
+    self->is_connected    = is_connected_impl;
+    self->registration    = registration_impl;
+    self->status          = status_impl;
+    self->log             = log_impl;
+    self->action_ack      = action_ack_impl;
+    self->ir_capture      = ir_capture_impl;
+    self->ir_transmit_ack = ir_transmit_ack_impl;
+    self->telemetry       = telemetry_impl;
 
     return self;
 }
@@ -163,6 +179,33 @@ static dom_models_error_t action_ack_impl(
     }
 
     return inf_messaging_def_pub_stub_impl_set_action_ack(self->ctx, device_id, execution_id, status, message);
+}
+
+static dom_models_error_t ir_capture_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const int32_t*                     raw_data,
+    size_t                             raw_data_count
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return inf_messaging_def_pub_stub_impl_set_ir_capture(self->ctx, device_id, raw_data, raw_data_count);
+}
+
+static dom_models_error_t ir_transmit_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return inf_messaging_def_pub_stub_impl_set_ir_transmit_ack(self->ctx, device_id, execution_id, status, message);
 }
 
 static dom_models_error_t telemetry_impl(

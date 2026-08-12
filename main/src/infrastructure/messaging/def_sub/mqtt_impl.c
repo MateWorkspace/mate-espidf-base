@@ -25,6 +25,10 @@ static dom_models_error_t config_impl(
     const char*                        device_id,
     dom_contracts_messaging_def_sub_t* self
 );
+static dom_models_error_t ir_tx_impl(
+    const char*                        device_id,
+    dom_contracts_messaging_def_sub_t* self
+);
 
 /* Constructor and Destructor */
 
@@ -55,6 +59,7 @@ dom_contracts_messaging_def_sub_t* inf_messaging_def_sub_mqtt_impl_new(
     self->ota              = ota_impl;
     self->action           = action_impl;
     self->config           = config_impl;
+    self->ir_tx            = ir_tx_impl;
 
     return self;
 }
@@ -112,4 +117,15 @@ static dom_models_error_t config_impl(
     }
 
     return inf_messaging_def_sub_mqtt_impl_subscribe_suffix(self->ctx, device_id, "config");
+}
+
+static dom_models_error_t ir_tx_impl(
+    const char*                        device_id,
+    dom_contracts_messaging_def_sub_t* self
+) {
+    if (!self || !self->ctx) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    return inf_messaging_def_sub_mqtt_impl_subscribe_suffix(self->ctx, device_id, "ir/tx");
 }

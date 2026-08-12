@@ -103,6 +103,48 @@ dom_models_error_t inf_messaging_def_pub_stub_impl_set_action_ack(
     return DOMAIN_MODELS_ERROR_OK;
 }
 
+dom_models_error_t inf_messaging_def_pub_stub_impl_set_ir_capture(
+    inf_messaging_def_pub_stub_impl_ctx_t* ctx,
+    const char*                            device_id,
+    const int32_t*                         raw_data,
+    size_t                                 raw_data_count
+) {
+    if (!ctx || !cstr_available(device_id) || !raw_data || raw_data_count == 0) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    copy_cstr(ctx->last_ir_capture_device_id, sizeof(ctx->last_ir_capture_device_id), device_id);
+
+    size_t copy_count = raw_data_count < INF_MESSAGING_DEF_PUB_STUB_IMPL_IR_RAW_DATA_MAX_LEN
+                            ? raw_data_count
+                            : INF_MESSAGING_DEF_PUB_STUB_IMPL_IR_RAW_DATA_MAX_LEN;
+    memcpy(ctx->last_ir_capture_raw_data, raw_data, copy_count * sizeof(int32_t));
+    ctx->last_ir_capture_raw_data_len = copy_count;
+    ctx->ir_capture_publish_cnt++;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+dom_models_error_t inf_messaging_def_pub_stub_impl_set_ir_transmit_ack(
+    inf_messaging_def_pub_stub_impl_ctx_t* ctx,
+    const char*                            device_id,
+    const char*                            execution_id,
+    const char*                            status,
+    const char*                            message
+) {
+    if (!ctx || !cstr_available(device_id) || !cstr_available(execution_id) || !cstr_available(status)) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    copy_cstr(ctx->last_ir_transmit_ack_device_id, sizeof(ctx->last_ir_transmit_ack_device_id), device_id);
+    copy_cstr(ctx->last_ir_transmit_ack_execution_id, sizeof(ctx->last_ir_transmit_ack_execution_id), execution_id);
+    copy_cstr(ctx->last_ir_transmit_ack_status, sizeof(ctx->last_ir_transmit_ack_status), status);
+    copy_cstr(ctx->last_ir_transmit_ack_message, sizeof(ctx->last_ir_transmit_ack_message), message);
+    ctx->ir_transmit_ack_publish_cnt++;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
 dom_models_error_t inf_messaging_def_pub_stub_impl_set_telemetry(
     inf_messaging_def_pub_stub_impl_ctx_t* ctx,
     const char*                            device_id,

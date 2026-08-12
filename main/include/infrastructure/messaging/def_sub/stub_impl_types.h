@@ -15,6 +15,7 @@ typedef struct {
     bool ota_subscribed;
     bool action_subscribed;
     bool config_subscribed;
+    bool ir_tx_subscribed;
 } inf_messaging_def_sub_stub_impl_cfg_t;
 
 #define INF_MESSAGING_DEF_SUB_STUB_IMPL_CFG_DEFAULT() \
@@ -23,6 +24,7 @@ typedef struct {
         .ota_subscribed              = false,         \
         .action_subscribed           = false,         \
         .config_subscribed           = false,         \
+        .ir_tx_subscribed            = false,         \
     }
 
 typedef struct {
@@ -30,14 +32,17 @@ typedef struct {
     bool   ota_subscribed;
     bool   action_subscribed;
     bool   config_subscribed;
+    bool   ir_tx_subscribed;
     char   last_registration_ack_device_id[INF_MESSAGING_DEF_SUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     char   last_ota_device_id[INF_MESSAGING_DEF_SUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     char   last_action_device_id[INF_MESSAGING_DEF_SUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     char   last_config_device_id[INF_MESSAGING_DEF_SUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
+    char   last_ir_tx_device_id[INF_MESSAGING_DEF_SUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     size_t registration_ack_subscribe_cnt;
     size_t ota_subscribe_cnt;
     size_t action_subscribe_cnt;
     size_t config_subscribe_cnt;
+    size_t ir_tx_subscribe_cnt;
 } inf_messaging_def_sub_stub_impl_ctx_t;
 
 #ifdef __cplusplus

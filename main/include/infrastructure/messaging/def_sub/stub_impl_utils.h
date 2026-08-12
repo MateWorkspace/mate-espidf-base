@@ -33,6 +33,11 @@ dom_models_error_t inf_messaging_def_sub_stub_impl_subscribe_config(
     const char*                            device_id
 );
 
+dom_models_error_t inf_messaging_def_sub_stub_impl_subscribe_ir_tx(
+    inf_messaging_def_sub_stub_impl_ctx_t* ctx,
+    const char*                            device_id
+);
+
 #ifdef __cplusplus
 }
 #endif

@@ -23,6 +23,7 @@ dom_models_error_t inf_messaging_def_sub_stub_impl_load_cfg(
     ctx->ota_subscribed              = cfg->ota_subscribed;
     ctx->action_subscribed           = cfg->action_subscribed;
     ctx->config_subscribed           = cfg->config_subscribed;
+    ctx->ir_tx_subscribed            = cfg->ir_tx_subscribed;
 
     return DOMAIN_MODELS_ERROR_OK;
 }
@@ -83,6 +84,21 @@ dom_models_error_t inf_messaging_def_sub_stub_impl_subscribe_config(
     ctx->config_subscribed = true;
     copy_cstr(ctx->last_config_device_id, sizeof(ctx->last_config_device_id), device_id);
     ctx->config_subscribe_cnt++;
+
+    return DOMAIN_MODELS_ERROR_OK;
+}
+
+dom_models_error_t inf_messaging_def_sub_stub_impl_subscribe_ir_tx(
+    inf_messaging_def_sub_stub_impl_ctx_t* ctx,
+    const char*                            device_id
+) {
+    if (!ctx || !cstr_available(device_id)) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    ctx->ir_tx_subscribed = true;
+    copy_cstr(ctx->last_ir_tx_device_id, sizeof(ctx->last_ir_tx_device_id), device_id);
+    ctx->ir_tx_subscribe_cnt++;
 
     return DOMAIN_MODELS_ERROR_OK;
 }

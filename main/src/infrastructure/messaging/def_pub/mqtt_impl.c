@@ -41,6 +41,19 @@ static dom_models_error_t action_ack_impl(
     const char*                        status,
     const char*                        message
 );
+static dom_models_error_t ir_capture_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const int32_t*                     raw_data,
+    size_t                             raw_data_count
+);
+static dom_models_error_t ir_transmit_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
+);
 static dom_models_error_t telemetry_impl(
     dom_contracts_messaging_def_pub_t* self,
     const char*                        device_id,
@@ -98,12 +111,14 @@ dom_contracts_messaging_def_pub_t* inf_messaging_def_pub_mqtt_impl_new(
         return NULL;
     }
 
-    self->is_connected = is_connected_impl;
-    self->registration = registration_impl;
-    self->status       = status_impl;
-    self->log          = log_impl;
-    self->action_ack   = action_ack_impl;
-    self->telemetry    = telemetry_impl;
+    self->is_connected    = is_connected_impl;
+    self->registration    = registration_impl;
+    self->status          = status_impl;
+    self->log             = log_impl;
+    self->action_ack      = action_ack_impl;
+    self->ir_capture      = ir_capture_impl;
+    self->ir_transmit_ack = ir_transmit_ack_impl;
+    self->telemetry       = telemetry_impl;
 
     esp_err_t event_err = esp_mqtt_client_register_event(
         ctx->cfg.mqtt_client,
@@ -259,6 +274,61 @@ static dom_models_error_t action_ack_impl(
         ctx,
         topic,
         inf_messaging_def_pub_mqtt_impl_build_action_ack_json(execution_id, status, message),
+        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
+        false
+    );
+}
+
+static dom_models_error_t ir_capture_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const int32_t*                     raw_data,
+    size_t                             raw_data_count
+) {
+    if (!self || !self->ctx || !device_id || device_id[0] == '\0' || !raw_data || raw_data_count == 0) {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_messaging_def_pub_mqtt_impl_ctx_t* ctx = self->ctx;
+
+    char               topic[INF_MESSAGING_DEF_PUB_MQTT_IMPL_TOPIC_MAX_LEN];
+    dom_models_error_t err = inf_messaging_def_pub_mqtt_impl_build_device_topic(device_id, "ir/rx", topic, sizeof(topic));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    return inf_messaging_def_pub_mqtt_impl_publish_json(
+        ctx,
+        topic,
+        inf_messaging_def_pub_mqtt_impl_build_ir_capture_json(raw_data, raw_data_count),
+        INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
+        false
+    );
+}
+
+static dom_models_error_t ir_transmit_ack_impl(
+    dom_contracts_messaging_def_pub_t* self,
+    const char*                        device_id,
+    const char*                        execution_id,
+    const char*                        status,
+    const char*                        message
+) {
+    if (!self || !self->ctx || !device_id || device_id[0] == '\0' || !execution_id || execution_id[0] == '\0' || !status || status[0] == '\0') {
+        return DOMAIN_MODELS_ERROR_BAD_ARGUMENT;
+    }
+
+    inf_messaging_def_pub_mqtt_impl_ctx_t* ctx = self->ctx;
+
+    char               topic[INF_MESSAGING_DEF_PUB_MQTT_IMPL_TOPIC_MAX_LEN];
+    dom_models_error_t err = inf_messaging_def_pub_mqtt_impl_build_device_topic(device_id, "ir/tx_ack", topic, sizeof(topic));
+    if (err != DOMAIN_MODELS_ERROR_OK) {
+        return err;
+    }
+
+    return inf_messaging_def_pub_mqtt_impl_publish_json(
+        ctx,
+        topic,
+        inf_messaging_def_pub_mqtt_impl_build_ir_transmit_ack_json(execution_id, status, message),
         INF_MESSAGING_DEF_PUB_MQTT_IMPL_QOS_DEFAULT,
         false
     );

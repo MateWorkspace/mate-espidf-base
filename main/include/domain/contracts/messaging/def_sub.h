@@ -29,6 +29,10 @@ struct dom_contracts_messaging_def_sub_t {
         const char*                        device_id,
         dom_contracts_messaging_def_sub_t* self
     );
+    dom_models_error_t (*ir_tx)(
+        const char*                        device_id,
+        dom_contracts_messaging_def_sub_t* self
+    );
 };
 
 static inline dom_contracts_messaging_def_sub_t* dom_contracts_messaging_def_sub_new(void* ctx) {

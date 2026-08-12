@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "domain/models/device_status.h"
@@ -42,6 +43,19 @@ struct dom_contracts_messaging_def_pub_t {
         size_t                             msg_len
     );
     dom_models_error_t (*action_ack)(
+        dom_contracts_messaging_def_pub_t* self,
+        const char*                        device_id,
+        const char*                        execution_id,
+        const char*                        status,
+        const char*                        message
+    );
+    dom_models_error_t (*ir_capture)(
+        dom_contracts_messaging_def_pub_t* self,
+        const char*                        device_id,
+        const int32_t*                     raw_data,
+        size_t                             raw_data_count
+    );
+    dom_models_error_t (*ir_transmit_ack)(
         dom_contracts_messaging_def_pub_t* self,
         const char*                        device_id,
         const char*                        execution_id,

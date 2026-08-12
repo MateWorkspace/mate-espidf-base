@@ -139,6 +139,71 @@ char* inf_messaging_def_pub_mqtt_impl_build_action_ack_json(
     return json;
 }
 
+char* inf_messaging_def_pub_mqtt_impl_build_ir_capture_json(
+    const int32_t* raw_data,
+    size_t         raw_data_count
+) {
+    if (!raw_data || raw_data_count == 0) {
+        return NULL;
+    }
+
+    cJSON* root = cJSON_CreateObject();
+    if (!root) {
+        return NULL;
+    }
+
+    cJSON* raw_data_array = cJSON_AddArrayToObject(root, "raw_data");
+    if (!raw_data_array) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < raw_data_count; i++) {
+        cJSON* item = cJSON_CreateNumber((double)raw_data[i]);
+        if (!item || !cJSON_AddItemToArray(raw_data_array, item)) {
+            cJSON_Delete(item);
+            cJSON_Delete(root);
+            return NULL;
+        }
+    }
+
+    char* json = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    return json;
+}
+
+char* inf_messaging_def_pub_mqtt_impl_build_ir_transmit_ack_json(
+    const char* execution_id,
+    const char* status,
+    const char* message
+) {
+    if (!cstr_available(execution_id) || !cstr_available(status)) {
+        return NULL;
+    }
+
+    cJSON* root = cJSON_CreateObject();
+    if (!root) {
+        return NULL;
+    }
+
+    if (!cJSON_AddStringToObject(root, "execution_id", execution_id) ||
+        !cJSON_AddStringToObject(root, "status", status)) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    if (cstr_available(message) && !cJSON_AddStringToObject(root, "message", message)) {
+        cJSON_Delete(root);
+        return NULL;
+    }
+
+    char* json = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    return json;
+}
+
 char* inf_messaging_def_pub_mqtt_impl_build_telemetry_json(
     const char* metric_name,
     const char* payload_schema_name,

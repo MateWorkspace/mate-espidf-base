@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "domain/models/device_status.h"
 
@@ -10,10 +11,11 @@
 extern "C" {
 #endif
 
-#define INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN 37
-#define INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN       96
-#define INF_MESSAGING_DEF_PUB_STUB_IMPL_LOG_MAX_LEN       256
-#define INF_MESSAGING_DEF_PUB_STUB_IMPL_PAYLOAD_MAX_LEN   256
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN   37
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN         96
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_LOG_MAX_LEN         256
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_PAYLOAD_MAX_LEN     256
+#define INF_MESSAGING_DEF_PUB_STUB_IMPL_IR_RAW_DATA_MAX_LEN 64
 
 typedef struct {
     bool connected;
@@ -38,6 +40,15 @@ typedef struct {
     char                       last_action_ack_execution_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_action_ack_status[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_action_ack_message[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_ir_capture_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
+    int32_t                    last_ir_capture_raw_data[INF_MESSAGING_DEF_PUB_STUB_IMPL_IR_RAW_DATA_MAX_LEN];
+    size_t                     last_ir_capture_raw_data_len;
+    size_t                     ir_capture_publish_cnt;
+    char                       last_ir_transmit_ack_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
+    char                       last_ir_transmit_ack_execution_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_ir_transmit_ack_status[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    char                       last_ir_transmit_ack_message[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
+    size_t                     ir_transmit_ack_publish_cnt;
     char                       last_telemetry_device_id[INF_MESSAGING_DEF_PUB_STUB_IMPL_DEVICE_ID_MAX_LEN];
     char                       last_telemetry_metric_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
     char                       last_telemetry_payload_schema_name[INF_MESSAGING_DEF_PUB_STUB_IMPL_STR_MAX_LEN];
