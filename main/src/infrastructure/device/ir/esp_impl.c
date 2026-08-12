@@ -113,6 +113,8 @@ void inf_device_ir_esp_impl_deinit(dom_contracts_device_ir_t* self) {
 
     if (ctx->infrared) {
         infrared_deinit((infrared_handle_t*)ctx->infrared);
+        infrared_delete((infrared_handle_t*)ctx->infrared);
+        ctx->infrared = NULL;
     }
     ctx->initialized = false;
 }
