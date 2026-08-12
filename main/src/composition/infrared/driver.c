@@ -18,7 +18,7 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-#define CMP_MAIN_DRIVER_MQTT_PROTO_TLS "mqtts"
+#define CMP_INFRARED_DRIVER_MQTT_PROTO_TLS "mqtts"
 
 /* Helper Function Prototypes */
 
@@ -184,7 +184,7 @@ static dom_models_error_t init_mqtt_client(cmp_infrared_launcher_t* launcher) {
         }
     }
 
-    if (strcmp(dom_models_preloaded_data.mqtt_proto, CMP_MAIN_DRIVER_MQTT_PROTO_TLS) == 0) {
+    if (strcmp(dom_models_preloaded_data.mqtt_proto, CMP_INFRARED_DRIVER_MQTT_PROTO_TLS) == 0) {
         mqtt_cfg.broker.verification.crt_bundle_attach = esp_crt_bundle_attach;
     }
 
