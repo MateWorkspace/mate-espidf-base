@@ -2,6 +2,8 @@ __pycache__/
 build/
 managed_components/
 sdkconfig*
-!sdkconfig.defaults.superpowers/
+!sdkconfig.defaults
+.superpowers/
 .todo
-upload.config.json.worktrees/
+upload.config.json
+.worktrees/
