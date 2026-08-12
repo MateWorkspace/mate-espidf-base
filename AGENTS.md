@@ -279,6 +279,15 @@ Use bounded monitoring and exit cleanly so the serial port is released.
 Normal `flash` preserves NVS; `erase-flash` is destructive and requires an
 explicit reason and a plan to restore credentials/configuration.
 
+**The current bench device on `/dev/ttyACM0` (MAC `ac:27:6e:5e:03:0c`) has a
+confirmed WiFi RF hardware fault** — do not spend time re-diagnosing "WiFi
+won't connect" as a software/config bug on this specific board without
+first checking `docs/agent_test/v1.0.0-dev.1/scenario/09-known-gaps-summary.md`
+(hardware-fault entry, dated 2026-08-12). BLE, MQTT session handling, and
+every other subsystem verified working on this same board; only 802.11
+authentication with an AP fails, deterministically, regardless of AP,
+credentials, signal strength, or BLE coexistence.
+
 ### Test-seed build
 
 There is no host/unit-test framework for the firmware today. For controlled
